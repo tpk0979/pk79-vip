@@ -38,6 +38,7 @@ export default {
     }
 
     const isPlaylistUrl = /\.m3u8?(\?|#|$)/i.test(targetUrl);
+    const isMpdUrl = /\.mpd(\?|#|$)/i.test(targetUrl);
 
     const upstreamHeaders = { 'User-Agent': userAgent, 'Accept': '*/*' };
     if (referer) upstreamHeaders['Referer'] = referer;
@@ -88,6 +89,33 @@ export default {
       });
     }
 
+    // --- DASH manifest (.mpd): chỉ chuẩn hoá <BaseURL> thành URL tuyệt đối trỏ
+    // thẳng về CDN gốc (KHÔNG proxy hoá từng segment — tránh tốn băng thông
+    // Worker cho luồng live, và tránh sai đường dẫn tương đối) ---
+    if (isMpdUrl) {
+      const body = await upstreamResponse.text();
+      const looksLikeMpd = /<MPD\b/i.test(body);
+
+      if (!looksLikeMpd) {
+        return new Response(body, {
+          status: upstreamResponse.status,
+          headers: { ...corsHeaders(), 'Content-Type': 'application/octet-stream' },
+        });
+      }
+
+      const finalUrl = upstreamResponse.url || targetUrl;
+      const rewrittenMpd = rewriteMpd(body, finalUrl);
+
+      return new Response(rewrittenMpd, {
+        status: upstreamResponse.status,
+        headers: {
+          ...corsHeaders(),
+          'Content-Type': 'application/dash+xml; charset=utf-8',
+          'Cache-Control': 'no-cache',
+        },
+      });
+    }
+
     // --- Mọi thứ khác (segment .ts, .flv, .mp4, .aac, luồng raw...) -> stream passthrough ---
     const headers = new Headers(corsHeaders());
     const passthroughHeaderNames = ['Content-Type', 'Content-Length', 'Content-Range', 'Accept-Ranges'];
@@ -127,6 +155,26 @@ function proxify(absoluteUrl, workerBase, userAgent, referer) {
   if (userAgent) q += '&ua=' + encodeURIComponent(userAgent);
   if (referer) q += '&ref=' + encodeURIComponent(referer);
   return workerBase + '?' + q;
+}
+
+function escapeXml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function rewriteMpd(body, baseUrl) {
+  const mpdDir = baseUrl.replace(/\/[^/]*$/, '/');
+
+  if (/<BaseURL>(.*?)<\/BaseURL>/is.test(body)) {
+    // Đã có BaseURL -> chuẩn hoá thành tuyệt đối
+    return body.replace(/<BaseURL>(.*?)<\/BaseURL>/gis, (match, inner) => {
+      const abs = resolveUrl(baseUrl, inner.trim());
+      return '<BaseURL>' + escapeXml(abs) + '</BaseURL>';
+    });
+  }
+
+  // Không có BaseURL -> chèn ngay sau thẻ <MPD ...> để segment tương đối
+  // tính đúng theo thư mục gốc CDN thật, thay vì theo URL của worker
+  return body.replace(/(<MPD\b[^>]*>)/i, '$1\n<BaseURL>' + escapeXml(mpdDir) + '</BaseURL>');
 }
 
 function rewritePlaylist(body, baseUrl, userAgent, referer, workerBase) {
