@@ -5,14 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src *; media-src * blob: data:; img-src * data:;">
-    <title>PK79 VIP</title>
+    <title>PK79 VIP - DRM Edition</title>
 <link rel="icon" type="image/png" href="./logo.png?v=4">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -38,11 +37,9 @@
             margin: 0;
         }
 
-        /* Modern Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
             height: 8px;
-            /* Tầm này dễ bấm thả hơn trên máy tính */
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
@@ -59,7 +56,6 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        /* Layout & Aesthetics */
         .glass-panel {
             background: var(--panel-bg);
             backdrop-filter: blur(24px);
@@ -82,7 +78,6 @@
             transform: translateX(4px);
         }
 
-        /* Premium Active State - Spinning Neon Border */
         .channel-item.active {
             background: rgba(20, 24, 40, 0.6) !important;
             border-color: transparent !important;
@@ -93,12 +88,10 @@
         .active-glow {
             position: absolute;
             inset: -1px;
-            /* Overlaps the transparent border */
             border-radius: inherit;
             pointer-events: none;
             z-index: 10;
             padding: 2px;
-            /* Thickness of the glowing border */
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
@@ -118,13 +111,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .playing-indicator {
@@ -142,34 +130,10 @@
         }
 
         @keyframes bounce {
-            from {
-                height: 4px;
-            }
-
-            to {
-                height: 12px;
-            }
+            from { height: 4px; }
+            to { height: 12px; }
         }
 
-        .audio-bar {
-            width: 6px;
-            background: var(--accent);
-            border-radius: 3px 3px 0 0;
-            transform-origin: bottom;
-            animation: audio-bar 0.8s ease-in-out infinite alternate;
-        }
-
-        @keyframes audio-bar {
-            0% {
-                transform: scaleY(0.3);
-            }
-
-            100% {
-                transform: scaleY(1);
-            }
-        }
-
-        /* Player Controls Overlays */
         #custom-controls {
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -180,7 +144,6 @@
             opacity: 1;
         }
 
-        /* Tooltip */
         .tooltip {
             position: relative;
         }
@@ -206,34 +169,14 @@
             opacity: 1;
         }
 
-        /* Square Player & No Custom Controls */
         .video-container {
             border-radius: 0 !important;
         }
 
-        /* Fullscreen: khi .video-container được fullscreen thay vì <video> */
         .video-container:fullscreen {
             width: 100vw;
             height: 100vh;
             background: #000;
-        }
-
-        .video-container:fullscreen #video-player {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .video-container:-webkit-full-screen {
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-        }
-
-        .video-container:-webkit-full-screen #video-player {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
         }
 
         .category-tab {
@@ -247,11 +190,6 @@
             box-shadow: 0 4px 12px var(--accent-glow);
         }
 
-        .group-icon-rotated {
-            transform: rotate(90deg);
-        }
-
-        /* Floating Player Controls (Stop + Quality) */
         .player-float-controls {
             position: absolute;
             top: 12px;
@@ -270,27 +208,6 @@
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
-        }
-
-        #epg-toggle-btn {
-            opacity: 0;
-            transform: translateY(6px);
-            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s, border-color 0.2s, color 0.2s;
-            pointer-events: none;
-        }
-
-        .video-container.controls-active:not(.hide-cursor) #epg-toggle-btn:not(.hidden) {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .video-container.hide-cursor {
-            cursor: none !important;
-        }
-
-        .video-container.hide-cursor * {
-            cursor: none !important;
         }
 
         .player-float-controls .ctrl-btn {
@@ -326,12 +243,10 @@
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.7) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.9);
             font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.03em;
             cursor: pointer;
             transition: all 0.2s ease;
             outline: none;
@@ -344,12 +259,6 @@
             box-shadow: 0 4px 16px var(--accent-glow);
         }
 
-        .player-float-controls .quality-select option {
-            background: #111;
-            color: #eee;
-        }
-
-        /* Toasts */
         #toast-container {
             position: fixed;
             top: 24px;
@@ -376,59 +285,57 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
             }
         }
 
-        /* Hide timeline & time display for live streams (Chromium native controls) */
-        video.is-live::-webkit-media-controls-timeline,
-        video.is-live::-webkit-media-controls-current-time-display,
-        video.is-live::-webkit-media-controls-time-remaining-display {
-            display: none !important;
-        }
-
-        /* Ẩn nút fullscreen mặc định của native controls để dùng nút custom */
         video::-webkit-media-controls-fullscreen-button {
             display: none !important;
         }
 
-        /* EPG Panel Styles */
-        #epg-panel {
-            transform: translateX(-100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 40;
+        .drm-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #ef4444;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            border-radius: 3px;
+            margin-left: 4px;
         }
 
-        #epg-panel.open {
-            transform: translateX(0);
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 16px;
         }
 
-        .epg-item {
-            border-left: 2px solid transparent;
+        .tab-button {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: #888888;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
             transition: all 0.2s;
+            border-bottom: 2px solid transparent;
         }
 
-        .epg-item.current {
-            background: rgba(99, 102, 241, 0.1);
-            border-left-color: var(--accent);
+        .tab-button.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
         }
 
-        .epg-progress {
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 1px;
-            overflow: hidden;
-            margin-top: 4px;
+        .tab-content {
+            display: none;
         }
 
-        .epg-progress-bar {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.3s;
+        .tab-content.active {
+            display: block;
         }
     </style>
 </head>
@@ -436,30 +343,34 @@
 <body class="selection:bg-indigo-500/30">
     <div id="toast-container"></div>
 
+    <!-- ADMIN PANEL BUTTON (Top Left) -->
+    <button onclick="openAdminPanel()" class="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center text-white transition-all" title="Admin Panel">
+        <i data-lucide="settings" class="w-5 h-5"></i>
+    </button>
+
     <div class="flex flex-col landscape:flex-row h-screen w-screen p-3 gap-3 overflow-hidden box-border">
 
         <!-- SIDEBAR -->
         <aside id="sidebar"
             class="order-2 landscape:order-1 flex-1 landscape:flex-none w-full landscape:w-[280px] lg:w-[320px] glass-panel rounded-3xl flex flex-col overflow-hidden transition-all duration-300 relative">
-            <!-- Sidebar Header -->
             <div class="p-4 border-b border-white/5 shrink-0 bg-white/[0.02]">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2.5">
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-    <img src="./logo.png?v=4" alt="PK79 VIP" class="w-full h-full object-contain">
-</div>
+                            <img src="./logo.png?v=4" alt="PK79 VIP" class="w-full h-full object-contain">
+                        </div>
                         <div>
                             <h1 class="font-bold text-sm tracking-tight text-white leading-none">
                                 PK79<span class="text-indigo-400"> VIP</span>
                             </h1>
                             <span class="text-[9px] text-muted font-medium uppercase tracking-[0.1em] mt-1 block">
-                                TRUYỀN HÌNH DÀNH CHO MỌI NHÀ
+                                TRUYỀN HÌNH + DRM
                             </span>
                         </div>
                     </div>
                     <button onclick="openAddDialog()"
                         class="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 hover:bg-indigo-500 hover:text-white border border-white/5 text-indigo-400 transition-all active:scale-95"
-                        title="Thêm nguồn m3u8">
+                        title="Thêm nguồn">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -470,586 +381,431 @@
                     <input type="text" id="search-input" placeholder="Tìm kiếm kênh..."
                         class="w-full pl-10 pr-9 py-2 bg-black/40 border border-white/5 rounded-2xl text-xs text-white focus:outline-none focus:border-indigo-500/40 transition-all placeholder-white/30"
                         oninput="filterChannels()">
-                    <button id="clear-search-btn"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white hidden focus:outline-none transition-colors z-10"
-                        onclick="const inp = document.getElementById('search-input'); inp.value=''; inp.focus(); filterChannels();"
-                        title="Xóa tìm kiếm">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
                 </div>
             </div>
 
-            <!-- List Space -->
             <div class="flex-1 overflow-hidden relative">
                 <ul id="channel-list" class="h-full overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                    <!-- Empty State -->
-                    <div id="empty-state"
-                        class="h-full flex flex-col items-center justify-center text-center p-6 opacity-40">
+                    <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center p-6 opacity-40">
                         <i data-lucide="layout-list" class="w-12 h-12 mb-4"></i>
                         <h3 class="font-medium text-sm">Chưa có kênh nào</h3>
-                        <p class="text-[11px] mt-1">Nhấn dấu cộng để thêm playlist của bạn</p>
+                        <p class="text-[11px] mt-1">Nhấn dấu cộng để thêm</p>
                     </div>
                 </ul>
             </div>
 
-            <!-- Sidebar Footer -->
             <div class="p-3 bg-black/40 border-t border-white/5 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-2">
-                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_var(--accent)]"></div>
-                    <span id="channel-count" class="text-[10px] text-muted font-semibold uppercase tracking-wider">
-                        0
-                        Kênh
-                    </span>
-                </div>
-                <button onclick="clearList()"
-                    class="text-[10px] text-muted hover:text-red-400 transition-colors uppercase tracking-wider font-bold">
-                    Dọn
-                    dẹp
-                </button>
+                <span id="channel-count" class="text-[10px] text-muted font-semibold uppercase">0 Kênh</span>
+                <button onclick="clearList()" class="text-[10px] text-muted hover:text-red-400 transition-colors uppercase font-bold">Dọn</button>
             </div>
         </aside>
 
-        <!-- MAIN PLAYER AREA WRAPPER -->
-        <div
-            class="order-1 landscape:order-2 flex-none landscape:flex-1 flex flex-col gap-3 landscape:gap-4 h-auto landscape:h-full overflow-hidden min-w-0 landscape:min-w-[320px]">
-            <!-- Video Container -->
-            <main
-                class="w-full aspect-video landscape:aspect-auto landscape:flex-1 glass-panel rounded-xl landscape:rounded-none overflow-hidden relative shadow-2xl shrink-0">
+        <!-- MAIN PLAYER AREA -->
+        <div class="order-1 landscape:order-2 flex-none landscape:flex-1 flex flex-col gap-3 landscape:gap-4 h-auto landscape:h-full overflow-hidden min-w-0">
+            <main class="w-full aspect-video landscape:aspect-auto landscape:flex-1 glass-panel rounded-xl landscape:rounded-none overflow-hidden relative shadow-2xl shrink-0">
                 <div class="w-full h-full bg-black relative video-container overflow-hidden">
                     <video id="video-player" class="w-full h-full object-contain" playsinline controls></video>
 
-                    <!-- Player Overlay (Intro) -->
-                    <div id="player-overlay"
-                        class="absolute inset-0 flex flex-col items-center justify-center bg-black transition-opacity duration-700 pointer-events-none">
+                    <div id="player-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black transition-opacity duration-700 pointer-events-none">
                         <div class="w-20 h-20 rounded-full bg-indigo-500/5 flex items-center justify-center relative">
                             <div class="absolute inset-0 bg-indigo-500/10 blur-3xl animate-pulse"></div>
-                            <i data-lucide="play"
-                                class="w-8 h-8 text-indigo-500 fill-indigo-500 relative z-10 ml-1"></i>
+                            <i data-lucide="play" class="w-8 h-8 text-indigo-500 fill-indigo-500 relative z-10 ml-1"></i>
                         </div>
                     </div>
 
-                    <!-- Audio/Radio Visualizer -->
-                    <div id="audio-visualizer"
-                        class="absolute inset-0 flex flex-col items-center justify-center bg-transparent hidden z-0 pointer-events-none p-6 w-full h-full box-border">
-                        <div
-                            class="flex flex-col items-center justify-center transform scale-75 sm:scale-90 transition-all duration-500 pb-24">
-                            <div
-                                class="relative w-24 h-24 sm:w-32 flex items-center justify-center shrink-0 mb-4 sm:mb-6">
-                                <div class="absolute inset-0 bg-indigo-500 rounded-full opacity-20 animate-ping"
-                                    style="animation-duration: 2.5s;"></div>
-                                <div class="absolute inset-4 bg-indigo-500 rounded-full opacity-30 animate-ping"
-                                    style="animation-duration: 2s; animation-delay: 0.5s;"></div>
-                                <div
-                                    class="relative z-10 bg-[#111] w-16 h-16 sm:w-24 sm:h-24 rounded-full border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.3)] flex items-center justify-center overflow-hidden">
-                                    <i id="audio-visualizer-icon" data-lucide="radio"
-                                        class="w-8 h-8 sm:w-10 sm:h-10 text-indigo-400"></i>
-                                </div>
-                            </div>
-
-                            <!-- Channel Logo (Just above the title, no background/border) -->
-                            <img id="audio-visualizer-logo" src=""
-                                class="w-full max-w-[200px] sm:max-w-xs aspect-video object-contain mb-4 hidden drop-shadow-2xl rounded-2xl shrink-0">
-
-                            <h3 id="audio-visualizer-title"
-                                class="text-white text-base sm:text-lg font-semibold tracking-wide mb-1 text-center w-full truncate px-4">
-                                Radio Stream</h3>
-                            <p id="audio-visualizer-desc"
-                                class="text-indigo-400/80 text-[10px] sm:text-xs uppercase tracking-[0.2em] mb-4 sm:mb-8 font-medium text-center w-full truncate px-4">
-                                Đang phát âm thanh</p>
-                            <div class="flex gap-1.5 h-8 sm:h-10 items-end shrink-0">
-                                <div class="audio-bar" style="height: 40%; animation-delay: 0.1s;"></div>
-                                <div class="audio-bar" style="height: 80%; animation-delay: 0.3s;"></div>
-                                <div class="audio-bar" style="height: 60%; animation-delay: 0.2s;"></div>
-                                <div class="audio-bar" style="height: 100%; animation-delay: 0.5s;"></div>
-                                <div class="audio-bar" style="height: 30%; animation-delay: 0.4s;"></div>
-                                <div class="audio-bar" style="height: 70%; animation-delay: 0.6s;"></div>
-                                <div class="audio-bar" style="height: 50%; animation-delay: 0.3s;"></div>
-                                <div class="audio-bar" style="height: 90%; animation-delay: 0.7s;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Floating Controls: Stop + Quality + Fullscreen -->
                     <div class="player-float-controls" id="float-controls">
                         <button class="ctrl-btn tooltip" data-tip="Dừng phát" onclick="stopChannel()">
                             <i data-lucide="square" class="w-3.5 h-3.5 fill-current"></i>
                         </button>
-                        <select id="quality-selector" class="quality-select hidden" title="Chọn độ phân giải">
+                        <select id="quality-selector" class="quality-select hidden">
                             <option value="-1">Auto</option>
                         </select>
-                        <button class="ctrl-btn tooltip" data-tip="Toàn màn hình" onclick="toggleFullscreen()"
-                            id="fullscreen-btn">
+                        <button class="ctrl-btn tooltip" data-tip="Toàn màn hình" onclick="toggleFullscreen()" id="fullscreen-btn">
                             <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
 
-
-
-                    <!-- Loading Spinner -->
-                    <div id="loading-overlay"
-                        class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md z-20 hidden text-white">
-                        <div
-                            class="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
-                        </div>
-                        <p id="resolve-status" class="hidden text-[10px] text-indigo-400/80 mt-3 flex items-center gap-1.5">
-                            <span class="inline-block w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></span>
-                            Đang dò link stream...
-                        </p>
+                    <div id="loading-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md z-20 hidden text-white">
+                        <div class="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <p id="drm-status" class="hidden text-[10px] text-indigo-400/80 mt-3">Đang xử lý DRM...</p>
                     </div>
-
-                    <!-- EPG Side Panel (Inside Main) -->
-                    <div id="epg-panel"
-                        class="absolute top-0 left-0 w-80 h-full bg-black/85 backdrop-blur-xl border-r border-white/10 flex flex-col pointer-events-auto z-40">
-                        <div class="p-4 border-b border-white/5 flex items-center justify-between bg-black/20">
-                            <h2 class="text-sm font-bold text-white flex items-center gap-2" title="Lịch Phát Sóng">
-                                <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-400 shrink-0"></i>
-                                <span id="epg-title" class="truncate max-w-[180px]">Lịch Phát Sóng</span>
-                            </h2>
-                            <div class="flex items-center gap-1">
-                                <button onclick="fetchEPG()"
-                                    class="p-1.5 hover:bg-white/10 rounded-lg transition-colors tooltip"
-                                    data-tip="Tải lại lịch">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4 text-muted"></i>
-                                </button>
-                                <button onclick="toggleEPG()"
-                                    class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-                                    <i data-lucide="x" class="w-4 h-4 text-muted"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="epg-content" class="flex-1 overflow-y-auto p-3 custom-scrollbar">
-                            <div class="h-full flex flex-col items-center justify-center text-center opacity-40 p-6">
-                                <i data-lucide="info" class="w-8 h-8 mb-3"></i>
-                                <p class="text-xs">Chọn kênh để xem lịch</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- EPG Toggle Button (Floating) -->
-                    <button id="epg-toggle-btn" onclick="toggleEPG()"
-                        class="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-indigo-500/50 hover:bg-indigo-500/20 shadow-xl hidden">
-                        <i data-lucide="calendar" class="w-5 h-5"></i>
-                    </button>
                 </div>
             </main>
 
-            <!-- Category Tabs (Separate Box) -->
             <div class="glass-panel p-3 rounded-2xl shrink-0">
-                <div id="category-tabs" class="flex gap-2 overflow-x-auto pb-1 custom-scrollbar no-scrollbar">
-                    <!-- Tabs rendered by JS -->
-                </div>
+                <div id="category-tabs" class="flex gap-2 overflow-x-auto pb-1 custom-scrollbar"></div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Thêm Kênh / Playlist (Popup Dialog) -->
-    <div id="add-dialog"
-        class="absolute inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-[#111111] border border-white/10 rounded-2xl p-5 w-full max-w-sm flex flex-col gap-4 shadow-2xl transform scale-95 transition-transform duration-300"
-            id="add-dialog-content">
+    <!-- DIALOG: Thêm Kênh -->
+    <div id="add-dialog" class="absolute inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-[#111111] border border-white/10 rounded-2xl p-5 w-full max-w-sm flex flex-col gap-4 shadow-2xl transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar" id="add-dialog-content">
 
             <div class="flex items-center justify-between border-b border-white/5 pb-3">
                 <h2 class="text-white font-semibold text-sm flex items-center gap-2">
                     <i data-lucide="list-plus" class="w-4 h-4 text-indigo-400"></i>
-                    Thêm Nguồn Phát
+                    Thêm Nguồn
                 </h2>
-                <button onclick="closeAddDialog()"
-                    class="text-[#888888] hover:text-white transition-colors p-1 rounded-md hover:bg-white/5">
+                <button onclick="closeAddDialog()" class="text-[#888888] hover:text-white transition-colors p-1">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <div class="relative flex items-center justify-center my-1">
-                <div class="absolute inset-x-0 h-[1px] bg-white/5"></div>
-                <span class="relative bg-[#111111] px-2 text-[10px] text-[#666666] font-medium uppercase">
-                    Tùy
-                    Chỉnh
-                </span>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[#888888] text-[11px] font-medium">URL M3U hoặc Link Stream</label>
+                <input type="text" id="url-input" placeholder="https://domain.com/playlist.m3u8"
+                    class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555]">
+                <button onclick="loadFromUrl(); closeAddDialog();" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold rounded-lg">
+                    TẢI
+                </button>
             </div>
 
-            <!-- Input URL -->
-            <div class="flex flex-col gap-1.5">
-                <label class="text-[#888888] text-[11px] font-medium px-1">Nhập Liên kết URL thủ công</label>
-                <div class="relative flex w-full group">
-                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                        <i data-lucide="link"
-                            class="w-3.5 h-3.5 text-[#666666] group-focus-within:text-indigo-400 transition-colors"></i>
-                    </div>
-                    <input type="text" id="url-input" placeholder="https://domain.com/playlist"
-                        class="w-full pl-8 pr-16 py-2.5 bg-[#151515] border border-white/5 rounded-xl text-xs text-white focus:outline-none focus:bg-[#1a1a1a] focus:border-indigo-500/50 transition-all placeholder-[#555555]">
-                    <button onclick="loadFromUrl(); closeAddDialog();"
-                        class="absolute right-1 top-1 bottom-1 bg-indigo-500 hover:bg-indigo-600 text-white px-3.5 rounded-lg text-[11px] font-medium transition-colors flex items-center shadow-sm">
-                        TẢI
+            <div class="border-t border-white/5 pt-4">
+                <label class="text-[#888888] text-[11px] font-medium">Upload File</label>
+                <input type="file" id="file-upload" accept=".m3u,.m3u8,.json,.xspf,.txt" class="hidden" onchange="handleFileUpload(event); closeAddDialog();">
+                <label for="file-upload" class="cursor-pointer flex items-center justify-center gap-2 bg-[#1a1a1a] hover:bg-[#222222] border border-white/10 text-white px-4 py-2 text-xs font-medium rounded-lg transition-all w-full mt-2">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-indigo-400"></i>
+                    Tải tệp (.m3u/.m3u8/.json)
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL MODAL -->
+    <div id="admin-dialog" class="absolute inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-[#111111] border border-white/10 rounded-2xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto flex flex-col gap-4 shadow-2xl transform scale-95 transition-transform duration-300 custom-scrollbar" id="admin-dialog-content">
+
+            <div class="flex items-center justify-between border-b border-white/5 pb-3 sticky top-0 bg-[#111111] z-10">
+                <h2 class="text-white font-bold text-lg flex items-center gap-2">
+                    <i data-lucide="settings" class="w-5 h-5 text-red-500"></i>
+                    Admin Panel
+                </h2>
+                <button onclick="closeAdminPanel()" class="text-[#888888] hover:text-white transition-colors p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Login Section -->
+            <div id="admin-login-section" class="flex flex-col gap-3 border-b border-white/5 pb-4">
+                <h3 class="text-white font-semibold text-sm">Đăng Nhập Admin</h3>
+                <div class="flex gap-2">
+                    <input type="password" id="admin-password" placeholder="Mật khẩu admin"
+                        class="flex-1 px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555]">
+                    <button onclick="adminLogin()" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold rounded-lg">
+                        Đăng Nhập
                     </button>
                 </div>
             </div>
 
-            <div class="relative flex items-center justify-center my-1">
-                <div class="absolute inset-x-0 h-[1px] bg-white/5"></div>
-                <span class="relative bg-[#111111] px-2 text-[10px] text-[#666666] font-medium uppercase">Hoặc</span>
+            <!-- Admin Controls -->
+            <div id="admin-controls-section" class="hidden flex flex-col gap-4">
+
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <button class="tab-button active" onclick="switchAdminTab('m3u')">
+                        <i data-lucide="file-text" class="w-4 h-4 inline mr-1"></i> File M3U
+                    </button>
+                    <button class="tab-button" onclick="switchAdminTab('drm')">
+                        <i data-lucide="lock" class="w-4 h-4 inline mr-1"></i> DRM Config
+                    </button>
+                </div>
+
+                <!-- Tab: Manage M3U Files -->
+                <div id="tab-m3u" class="tab-content active">
+                    <h3 class="text-white font-semibold text-sm mb-3">Quản Lý File M3U</h3>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="new-m3u-name" placeholder="Tên (vd: Kênh Việt)"
+                            class="flex-1 px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555]">
+                        <input type="text" id="new-m3u-url" placeholder="URL file M3U"
+                            class="flex-1 px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555]">
+                        <button onclick="addM3UFile()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg">
+                            Thêm
+                        </button>
+                    </div>
+
+                    <div id="m3u-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                    </div>
+                </div>
+
+                <!-- Tab: DRM Configuration -->
+                <div id="tab-drm" class="tab-content">
+                    <h3 class="text-white font-semibold text-sm mb-3">Cấu Hình DRM AutoKey</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[#888888] text-[11px] font-medium block mb-1">Tên Kênh</label>
+                            <input type="text" id="drm-channel-name" placeholder="vd: HBO Max"
+                                class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50">
+                        </div>
+
+                        <div>
+                            <label class="text-[#888888] text-[11px] font-medium block mb-1">URL Stream (DASH/HLS)</label>
+                            <input type="text" id="drm-stream-url" placeholder="https://example.com/stream.mpd"
+                                class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50">
+                        </div>
+
+                        <div>
+                            <label class="text-[#888888] text-[11px] font-medium block mb-1">Loại DRM</label>
+                            <select id="drm-type" class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50">
+                                <option value="clearkey">ClearKey (AutoKey)</option>
+                                <option value="widevine">Widevine (AutoKey)</option>
+                                <option value="playready">PlayReady (AutoKey)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-[#888888] text-[11px] font-medium block mb-1">License Server URL</label>
+                            <input type="text" id="drm-license-url" placeholder="https://license.example.com/get-license"
+                                class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555]">
+                            <p class="text-[9px] text-[#666666] mt-1">Để trống để sử dụng PlayReady Challenge/ClearKey mặc định</p>
+                        </div>
+
+                        <div>
+                            <label class="text-[#888888] text-[11px] font-medium block mb-1">User-Agent (nếu cần)</label>
+                            <input type="text" id="drm-user-agent" placeholder="Mozilla/5.0..."
+                                class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555]">
+                        </div>
+
+                        <div>
+                            <label class="text-[#888888] text-[11px] font-medium block mb-1">ClearKey (JSON hoặc KID:KEY)</label>
+                            <textarea id="drm-clearkey" placeholder='{"kid":"...","k":"..."} hoặc kid:key'
+                                class="w-full px-3 py-2 bg-[#151515] border border-white/5 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500/50 placeholder-[#555555] h-16"></textarea>
+                        </div>
+
+                        <button onclick="addDRMConfig()" class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-lg">
+                            Thêm DRM Config
+                        </button>
+                    </div>
+
+                    <div id="drm-list" class="space-y-2 mt-4 max-h-60 overflow-y-auto custom-scrollbar">
+                    </div>
+                </div>
+
+                <!-- Logout -->
+                <button onclick="adminLogout()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg flex items-center gap-2 justify-center mt-4">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    Đăng Xuất
+                </button>
             </div>
-
-            <!-- Nút Upload File Local -->
-            <div class="flex flex-col gap-1.5 mb-1">
-                <label class="text-[#888888] text-[11px] font-medium px-1">Mở File từ máy tính cục bộ</label>
-                <input type="file" id="file-upload" accept=".m3u,.m3u8,.json,.xspf,.txt" class="hidden"
-                    onchange="handleFileUpload(event); closeAddDialog();">
-                <label for="file-upload"
-                    class="cursor-pointer flex items-center justify-center gap-2 bg-[#1a1a1a] hover:bg-[#222222] border border-white/10 text-white px-4 py-2.5 text-xs font-medium rounded-xl transition-all w-full group">
-                    <i data-lucide="folder-open"
-                        class="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform"></i>
-                    <span>Tải tệp từ máy (.m3u/.m3u8/.json/.xspf/.txt)</span>
-                </label>
-            </div>
-
-
         </div>
     </div>
 
-    </section>
-    </main>
-
     <script>
-        // Khởi tạo icons
         lucide.createIcons();
         if (typeof shaka !== 'undefined') shaka.polyfill.installAll();
 
-        // ============================================================
-        // LINK RESOLVER ENGINE V4 — XHR + BLOB URL
-        // ============================================================
-        // Cách này hoạt động với MỌI link PHP:
-        // 1. Dùng XMLHttpRequest với responseType = 'document' để bypass CORS
-        // 2. Parse response text tìm stream URL thật
-        // 3. Nếu tìm thấy M3U playlist text → tạo Blob URL cho Hls.js
-        // 4. Nếu tìm thấy URL thật → dùng luôn
-        // 5. Không dùng fetch, không dùng Service Worker, không dùng proxy
+        // ==================== ADMIN CONFIG ====================
+        const ADMIN_PASSWORD = 'admin123';
+        let isAdminLoggedIn = false;
+        let m3uFiles = JSON.parse(localStorage.getItem('m3uFiles')) || [];
+        let drmConfigs = JSON.parse(localStorage.getItem('drmConfigs')) || [];
 
-        /**
-         * Resolve URL — dùng XHR + Blob URL
-         */
-        async function resolveStreamUrl(url, channelProps = {}) {
-            // Link thật — không cần resolve
-            if (isDirectStreamUrl(url)) return url;
-
-            console.log(`[Resolver] Resolving PHP: ${url.substring(0, 100)}`);
-            const startTime = Date.now();
-
-            // === PHƯƠNG ÁN 1: XHR (vượt CORS khi mở từ file://) ===
-            try {
-                const result = await xhrFetchText(url);
-                if (result.text && result.text.length > 5) {
-                    const parsed = parseResponseForStream(result.text, result.finalUrl || url, url);
-                    if (parsed) {
-                        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-                        console.log(`[Resolver] ✅ XHR OK (${elapsed}s): ${String(parsed).substring(0, 120)}`);
-                        return parsed;
-                    }
-                    // Nếu finalUrl là .m3u8/.mpd thì dùng luôn
-                    if (result.finalUrl && result.finalUrl !== url && /\.(m3u8|mpd|ts)(\?|#|$)/i.test(result.finalUrl)) {
-                        console.log(`[Resolver] ✅ XHR finalUrl: ${result.finalUrl.substring(0,120)}`);
-                        return result.finalUrl;
-                    }
-                }
-            } catch (e) {
-                console.warn('[Resolver] XHR failed:', e.message);
-            }
-
-            // === PHƯƠNG ÁN 2: fetch trực tiếp (follow redirect tự động) ===
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                        'Accept': '*/*',
-                        'Referer': 'https://vietanhtv.id.vn/',
-                    },
-                    redirect: 'follow',
-                });
-                if (response.ok) {
-                    const finalUrl = response.url;
-                    const text = await response.text();
-                    const parsed = parseResponseForStream(text, finalUrl, url);
-                    if (parsed) {
-                        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-                        console.log(`[Resolver] ✅ Fetch OK (${elapsed}s): ${String(parsed).substring(0, 120)}`);
-                        return parsed;
-                    }
-                    if (finalUrl !== url && !finalUrl.includes('.php')) return finalUrl;
-                }
-            } catch (e) {
-                console.warn('[Resolver] Fetch failed:', e.message);
-            }
-
-            // === PHƯƠNG ÁN 3: CORS Proxy (cho HTTPS deployment) ===
-            const CORS_PROXIES = [
-                ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
-                'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?url=',
-                'https://api.codetabs.com/v1/proxy?quest=',
-            ];
-            for (const proxy of CORS_PROXIES) {
-                try {
-                    const proxyUrl = proxy + encodeURIComponent(url);
-                    const resp = await fetch(proxyUrl, { redirect: 'follow' });
-                    if (resp.ok) {
-                        const text = await resp.text();
-                        if (text && text.length > 5) {
-                            const parsed = parseResponseForStream(text, url, url);
-                            if (parsed) {
-                                const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-                                console.log(`[Resolver] ✅ Proxy ${proxy} OK (${elapsed}s): ${String(parsed).substring(0, 120)}`);
-                                return parsed;
-                            }
-                            // Nếu là M3U playlist text, tạo Blob URL
-                            if (text.includes('#EXTM3U') || text.includes('#EXTINF')) {
-                                const blob = new Blob([text], { type: 'application/vnd.apple.mpegurl' });
-                                if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-                                currentBlobUrl = URL.createObjectURL(blob);
-                                console.log(`[Resolver] ✅ Proxy ${proxy} → Blob URL: ${currentBlobUrl.substring(0,50)}`);
-                                return currentBlobUrl;
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.warn(`[Resolver] Proxy ${proxy} failed:`, e.message);
-                }
-            }
-
-            console.warn(`[Resolver] ❌ Thất bại sau ${((Date.now()-startTime)/1000).toFixed(1)}s`);
-            return url;
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.closest('.tab-button').classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
         }
 
-        /**
-         * XMLHttpRequest để lấy response text — vượt CORS
-         */
-        function xhrFetchText(url) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, true);
-                    xhr.timeout = 20000;
-                    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-                    xhr.setRequestHeader('Accept', '*/*');
-                    xhr.setRequestHeader('Referer', 'https://vietanhtv.id.vn/');
-                    xhr.responseType = 'text';
+        function openAdminPanel() {
+            const dialog = document.getElementById('admin-dialog');
+            const content = document.getElementById('admin-dialog-content');
+            dialog.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.replace('scale-95', 'scale-100');
+            if (isAdminLoggedIn) loadM3UList();
+        }
 
-                    xhr.onload = function() {
-                        if (xhr.status === 200 || xhr.status === 302 || xhr.status === 301 || xhr.status === 0) {
-                            // XHR không follow redirect, nhưng responseURL cho ta URL cuối cùng
-                            resolve({
-                                text: xhr.responseText,
-                                finalUrl: xhr.responseURL || url
-                            });
-                        } else {
-                            reject(new Error(`HTTP ${xhr.status}`));
-                        }
-                    };
-                    xhr.onerror = () => reject(new Error('XHR error'));
-                    xhr.ontimeout = () => reject(new Error('XHR timeout'));
-                    xhr.send();
-                } catch (e) {
-                    reject(e);
-                }
+        function closeAdminPanel() {
+            const dialog = document.getElementById('admin-dialog');
+            const content = document.getElementById('admin-dialog-content');
+            dialog.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.replace('scale-100', 'scale-95');
+        }
+
+        function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-login-section').classList.add('hidden');
+                document.getElementById('admin-controls-section').classList.remove('hidden');
+                document.getElementById('admin-password').value = '';
+                loadM3UList();
+                loadDRMList();
+                showToast('✅ Đăng nhập admin thành công!', 'success');
+            } else {
+                showToast('❌ Mật khẩu không đúng!', 'error');
+            }
+        }
+
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-login-section').classList.remove('hidden');
+            document.getElementById('admin-controls-section').classList.add('hidden');
+            document.getElementById('admin-password').value = '';
+            showToast('Đã đăng xuất.', 'success');
+        }
+
+        function addM3UFile() {
+            const name = document.getElementById('new-m3u-name').value.trim();
+            const url = document.getElementById('new-m3u-url').value.trim();
+
+            if (!name || !url) {
+                showToast('Vui lòng nhập tên và URL!', 'error');
+                return;
+            }
+
+            const m3u = { id: Date.now(), name, url, addedDate: new Date().toLocaleString('vi-VN') };
+            m3uFiles.push(m3u);
+            localStorage.setItem('m3uFiles', JSON.stringify(m3uFiles));
+            
+            document.getElementById('new-m3u-name').value = '';
+            document.getElementById('new-m3u-url').value = '';
+            
+            loadM3UList();
+            showToast(`✅ Đã thêm: ${name}`, 'success');
+        }
+
+        function deleteM3UFile(id) {
+            if (confirm('Xác nhận xóa?')) {
+                m3uFiles = m3uFiles.filter(m => m.id !== id);
+                localStorage.setItem('m3uFiles', JSON.stringify(m3uFiles));
+                loadM3UList();
+                showToast('Đã xóa.', 'success');
+            }
+        }
+
+        function loadM3UFile(url, name) {
+            document.getElementById('url-input').value = url;
+            closeAdminPanel();
+            loadFromUrl();
+            showToast(`📥 Tải: ${name}`, 'success');
+        }
+
+        function loadM3UList() {
+            const listEl = document.getElementById('m3u-list');
+            listEl.innerHTML = '';
+
+            if (m3uFiles.length === 0) {
+                listEl.innerHTML = '<p class="text-[#888888] text-xs text-center py-4">Chưa có</p>';
+                return;
+            }
+
+            m3uFiles.forEach(m3u => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-[#1a1a1a] border border-white/5 p-2 rounded-lg';
+                item.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-white font-semibold text-xs truncate">${m3u.name}</h4>
+                        <p class="text-[#888888] text-[9px] truncate">${m3u.url}</p>
+                    </div>
+                    <div class="flex gap-1 ml-2 shrink-0">
+                        <button onclick="loadM3UFile('${m3u.url}', '${m3u.name}')" class="p-1 bg-green-600 hover:bg-green-700 text-white rounded text-[9px]">
+                            ▼
+                        </button>
+                        <button onclick="deleteM3UFile(${m3u.id})" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[9px]">
+                            ✕
+                        </button>
+                    </div>
+                `;
+                listEl.appendChild(item);
             });
         }
 
-        /**
-         * Parse response text để tìm stream URL
-         */
-        function parseResponseForStream(text, finalUrl, originalUrl) {
-            if (!text || text.length < 5) return null;
-            const trimmed = text.trim();
+        function addDRMConfig() {
+            const name = document.getElementById('drm-channel-name').value.trim();
+            const streamUrl = document.getElementById('drm-stream-url').value.trim();
+            const drmType = document.getElementById('drm-type').value;
+            const licenseUrl = document.getElementById('drm-license-url').value.trim();
+            const userAgent = document.getElementById('drm-user-agent').value.trim();
+            const clearKey = document.getElementById('drm-clearkey').value.trim();
 
-            // === JSON ===
-            if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-                try {
-                    const json = JSON.parse(trimmed);
-                    const url = findUrlInJson(json);
-                    if (url) return url;
-                    if (json.keys || json.kid) return trimmed; // ClearKey
-                } catch { /* not JSON */ }
+            if (!name || !streamUrl) {
+                showToast('Vui lòng nhập tên và URL stream!', 'error');
+                return;
             }
 
-            // === M3U Playlist ===
-            if (text.includes('#EXTM3U') || text.includes('#EXTINF')) {
-                const lines = text.split('\n');
-                for (const line of lines) {
-                    const l = line.trim();
-                    if (l.startsWith('http') && (l.includes('.m3u8') || l.includes('.ts') || l.includes('.mp4'))) {
-                        return l;
-                    }
-                    if (l.endsWith('.m3u8') || l.endsWith('.ts')) {
-                        try { return new URL(l, finalUrl || originalUrl).href; } catch { return l; }
-                    }
-                }
-                if (finalUrl && finalUrl !== originalUrl && !finalUrl.includes('.php')) return finalUrl;
-                return text; // Trả về nguyên playlist để tạo Blob URL
-            }
-
-            // === MPD/DASH ===
-            if (text.includes('<MPD') || (text.includes('<?xml') && text.includes('mpd:'))) {
-                if (finalUrl && finalUrl !== originalUrl) return finalUrl;
-                return text;
-            }
-
-            // === URL trực tiếp ===
-            const urls = [...trimmed.matchAll(/https?:\/\/[^\s<>"']+/g)].map(m => m[0]);
-            const streamUrls = urls.filter(u => /\.(m3u8|mpd|ts|mp4|flv|aac|mp3|m4a)(\?|#|$)/i.test(u));
-            if (streamUrls.length > 0) return streamUrls[0];
-            if (urls.length === 1) return urls[0];
-
-            // === HTML ===
-            if (text.includes('<html') || text.includes('<!DOCTYPE')) {
-                const patterns = [
-                    /<iframe[^>]+src=["'](https?:\/\/[^"']+)["']/i,
-                    /<video[^>]+src=["'](https?:\/\/[^"']+)["']/i,
-                    /<source[^>]+src=["'](https?:\/\/[^"']+)["']/i,
-                    /<a[^>]+href=["'](https?:\/\/[^"']+\.(?:m3u8|mpd|ts)[^"']*)["']/i,
-                    /embed["']?\s*:\s*["'](https?:\/\/[^"']+)["']/i,
-                    /file["']?\s*:\s*["'](https?:\/\/[^"']+)["']/i,
-                ];
-                for (const pattern of patterns) {
-                    const match = text.match(pattern);
-                    if (match) return match[1];
-                }
-                for (const u of urls) {
-                    if (/\.(m3u8|mpd|ts)(\?|#|$)/i.test(u)) return u;
-                }
-            }
-
-            // === Deep search ===
-            const deepMatch = text.match(/https?:\/\/[^'"\s<>)]+\.(?:m3u8|mpd|ts)[^'"\s<>)]*/i);
-            if (deepMatch) return deepMatch[0];
-
-            return null;
-        }
-
-        /**
-         * Tìm URL trong JSON object (đệ quy)
-         */
-        function findUrlInJson(json) {
-            if (!json || typeof json !== 'object') return null;
-            const keys = ['url', 'link', 'src', 'source', 'file', 'location', 'redirect',
-                'stream', 'stream_url', 'streamUrl', 'hls', 'dash', 'm3u8', 'mpd'];
-            for (const key of keys) {
-                if (typeof json[key] === 'string' && json[key].startsWith('http')) return json[key];
-            }
-            for (const key of Object.keys(json)) {
-                if (typeof json[key] === 'object') {
-                    const result = findUrlInJson(json[key]);
-                    if (result) return result;
-                }
-            }
-            if (Array.isArray(json)) {
-                for (const item of json) {
-                    const result = findUrlInJson(item);
-                    if (result) return result;
-                }
-            }
-            return null;
-        }
-
-        /**
-         * Kiểm tra URL có phải stream trực tiếp không
-         */
-        /**
-         * Lấy User-Agent / Referer tùy chỉnh khai báo trong playlist
-         * (qua #EXTVLCOPT:http-user-agent=..., #KODIPROP:http-referrer=...
-         *  hoặc các biến thể tên khác nhau tùy nguồn playlist)
-         */
-        function getChannelHeaders(channel) {
-            const props = (channel && channel.props) || {};
-            const findProp = (...keys) => {
-                for (const k of keys) {
-                    if (props[k]) return props[k];
-                    const found = Object.keys(props).find(pk => pk.toLowerCase() === k.toLowerCase());
-                    if (found && props[found]) return props[found];
-                }
-                return '';
+            const drmConfig = {
+                id: Date.now(),
+                name,
+                streamUrl,
+                drmType,
+                licenseUrl: licenseUrl || null,
+                userAgent: userAgent || null,
+                clearKey: clearKey || null,
+                addedDate: new Date().toLocaleString('vi-VN')
             };
-            return {
-                userAgent: findProp('http-user-agent', 'user-agent', 'useragent'),
-                referer: findProp('http-referrer', 'http-referer', 'referrer', 'referer')
-            };
+
+            drmConfigs.push(drmConfig);
+            localStorage.setItem('drmConfigs', JSON.stringify(drmConfigs));
+
+            document.getElementById('drm-channel-name').value = '';
+            document.getElementById('drm-stream-url').value = '';
+            document.getElementById('drm-license-url').value = '';
+            document.getElementById('drm-user-agent').value = '';
+            document.getElementById('drm-clearkey').value = '';
+
+            loadDRMList();
+            showToast(`✅ Thêm DRM Config: ${name}`, 'success');
         }
 
-        /**
-         * Trình duyệt chặn JS ghi đè header "Referer" (và hạn chế "User-Agent"),
-         * nên với các kênh cần header riêng, ta định tuyến qua proxy.php —
-         * PHP sẽ dùng cURL gọi origin kèm đúng header, trình duyệt chỉ nói chuyện với proxy.
-         */
-        // Ghép PROXY_BASE_URL thành tiền tố URL đúng cách, hỗ trợ cả 2 dạng:
-        // - File cụ thể: "./proxy.php"                 -> "./proxy.php?url="
-        // - Domain gốc Worker: "https://xxx.workers.dev" -> "https://xxx.workers.dev/?url="
-        function proxyQueryPrefix() {
-            if (!PROXY_BASE_URL) return '';
-            return /\.php(\?.*)?$/i.test(PROXY_BASE_URL)
-                ? PROXY_BASE_URL + '?url='
-                : PROXY_BASE_URL.replace(/\/$/, '') + '/?url=';
+        function deleteDRMConfig(id) {
+            if (confirm('Xác nhận xóa DRM config?')) {
+                drmConfigs = drmConfigs.filter(d => d.id !== id);
+                localStorage.setItem('drmConfigs', JSON.stringify(drmConfigs));
+                loadDRMList();
+                showToast('Đã xóa.', 'success');
+            }
         }
 
-        function buildProxyUrl(targetUrl, userAgent, referer) {
-            if (!PROXY_BASE_URL) return targetUrl; // Chưa cấu hình Worker -> phát trực tiếp (có thể lỗi UA/Referer)
-            let proxied = proxyQueryPrefix() + encodeURIComponent(targetUrl);
-            if (userAgent) proxied += '&ua=' + encodeURIComponent(userAgent);
-            if (referer) proxied += '&ref=' + encodeURIComponent(referer);
-            return proxied;
+        function playDRMConfig(id) {
+            const config = drmConfigs.find(d => d.id === id);
+            if (!config) return;
+
+            closeAdminPanel();
+            playDRMChannel(config);
         }
 
-        function isDirectStreamUrl(url) {
-            if (!url) return false;
-            return /\.(m3u8|mpd|ts|mp4|flv|aac|mp3|m4a|ogg|webm|mov|mkv|flac|opus)(\?|#|$)/i.test(url) ||
-                   url.includes('Manifest') || url.includes('playlist.m3u') ||
-                   url.includes('/play/') || url.includes(':2086/') || url.includes(':2087/');
+        function loadDRMList() {
+            const listEl = document.getElementById('drm-list');
+            listEl.innerHTML = '';
+
+            if (drmConfigs.length === 0) {
+                listEl.innerHTML = '<p class="text-[#888888] text-xs text-center py-4">Chưa có</p>';
+                return;
+            }
+
+            drmConfigs.forEach(drm => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-[#1a1a1a] border border-white/5 p-2 rounded-lg';
+                item.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-white font-semibold text-xs">${drm.name} <span class="drm-badge">${drm.drmType.toUpperCase()}</span></h4>
+                        <p class="text-[#888888] text-[9px] truncate">${drm.streamUrl}</p>
+                        <p class="text-[#666666] text-[8px] mt-1">License: ${drm.licenseUrl || 'Mặc định'}</p>
+                    </div>
+                    <div class="flex gap-1 ml-2 shrink-0">
+                        <button onclick="playDRMConfig(${drm.id})" class="p-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[9px]">
+                            ▶
+                        </button>
+                        <button onclick="deleteDRMConfig(${drm.id})" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[9px]">
+                            ✕
+                        </button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
         }
 
-        /**
-         * Detect loại stream từ URL
-         */
-        function detectStreamType(url) {
-            if (!url) return 'unknown';
-            if (/^rtmps?:\/\//i.test(url) || /^rtsp:\/\//i.test(url)) return 'unsupported';
-            if (url.includes('.mpd') || url.includes('Manifest') || url.includes('mpd:')) return 'dash';
-            if (url.includes('.m3u8') || url.includes('m3u8') || url.includes('playlist.m3u')) return 'hls';
-            if (/\.flv(\?|#|$)/i.test(url) || url.includes('extension=flv')) return 'flv';
-            if (url.includes('.ts') || url.includes('extension=ts')) return 'mpegts';
-            if (/\.(mp3|aac|m4a|ogg|flac|opus)(\?|#|$)/i.test(url)) return 'audio';
-            if (/\.(mp4|webm|mov|mkv)(\?|#|$)/i.test(url)) return 'video';
-            return 'unknown';
-        }
-
-        // ============================================================
-        // END LINK RESOLVER ENGINE V4
-        // ============================================================
-
-        // Trạng thái
-        // ============================================================
-        // CẤU HÌNH PROXY (cho kênh cần User-Agent/Referer riêng)
-        // GitHub Pages không chạy được PHP, nên proxy chạy trên Cloudflare
-        // Worker (miễn phí). Sau khi deploy Worker, dán URL của nó vào đây,
-        // ví dụ: "https://ten-worker-cua-ban.username.workers.dev"
-        // Để trống ("") thì tính năng UA/Referer riêng sẽ bị tắt.
-        // ============================================================
-        const PROXY_BASE_URL = "";
+        // ==================== PLAYER LOGIC ====================
+        const PROXY_BASE_URL = "https://pk79-proxy.tongphuockhai9.workers.dev";
 
         let allChannels = [];
         let hlsInstance = null;
         let shakaInstance = null;
-        let mpegtsInstance = null;
         let currentPlayingUrl = null;
-        let selectedChannelId = null;
+        let currentDRMConfig = null;
 
-        // Anti audio-distortion intervals
-        let liveEdgeCheckInterval = null;
-        let bufferCleanupInterval = null;
-
-        // EPG State
-        const DEFAULT_EPG_URL = 'https://vnepg.site/epg.xml';
-        let epgData = new Map(); // channelId -> [programs]
-        let epgChannels = new Map(); // channelId -> name
-        let isEPGPanelOpen = false;
-        let epgFetchStatus = 'idle'; // idle, fetching, success, error
-
-        // DOM Elements
         const videoPlayer = document.getElementById('video-player');
         const channelListEl = document.getElementById('channel-list');
         const emptyStateEl = document.getElementById('empty-state');
@@ -1059,16 +815,8 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const videoContainer = document.querySelector('.video-container');
 
-        videoPlayer.addEventListener('resize', () => {
-            const audioVis = document.getElementById('audio-visualizer');
-            if (audioVis && videoPlayer.videoHeight > 0) {
-                audioVis.classList.add('hidden');
-            }
-        });
-
-        // Hide Cursor & Controls on Inactivity (Desktop + Mobile)
         let inactivityTimeout;
-        const CONTROLS_TIMEOUT = 2500; // 2 giây rồi ẩn (khớp với native controls)
+        const CONTROLS_TIMEOUT = 2500;
 
         function showControls() {
             videoContainer.classList.remove('hide-cursor');
@@ -1078,104 +826,54 @@
         }
 
         function hideControls() {
-            // Luôn ẩn controls-active (cả fullscreen lẫn non-fullscreen)
             videoContainer.classList.remove('controls-active');
-            // Chỉ ẩn cursor trong fullscreen
-            if (document.fullscreenElement) {
-                videoContainer.classList.add('hide-cursor');
-            }
         }
 
-        // Desktop: mousemove hiện controls, mouseleave ẩn ngay
         videoContainer.addEventListener('mousemove', showControls);
         videoContainer.addEventListener('mousedown', showControls);
-        videoContainer.addEventListener('mouseleave', () => {
-            clearTimeout(inactivityTimeout);
-            hideControls();
-        });
 
-        // Mobile: tap vào video toggle controls, tự ẩn sau 3.5s
-        videoContainer.addEventListener('touchstart', (e) => {
-            // Nếu tap vào nút control/select → không toggle, để nút hoạt động bình thường
-            const tag = e.target.tagName;
-            if (tag === 'BUTTON' || tag === 'SELECT' || tag === 'OPTION' ||
-                e.target.closest('button') || e.target.closest('select') ||
-                e.target.closest('#epg-panel')) {
-                return; // Để event đi qua bình thường
-            }
-
-            if (videoContainer.classList.contains('controls-active')) {
-                // Đang hiện → ẩn ngay
-                clearTimeout(inactivityTimeout);
-                hideControls();
-            } else {
-                // Đang ẩn → hiện, rồi tự ẩn sau 3.5s
-                showControls();
-            }
-        }, { passive: true });
-
-        // === Fullscreen Change Listener ===
-        // Cập nhật icon của nút custom khi vào/thoát chế độ toàn màn hình
         function handleFSChange() {
             const fsBtn = document.getElementById('fullscreen-btn');
-            const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+            const isFS = document.fullscreenElement || document.webkitFullscreenElement;
 
-            if (isFS) {
-                // Đang fullscreen
-                if (fsBtn) {
-                    fsBtn.setAttribute('data-tip', 'Thoát toàn màn hình');
-                    fsBtn.innerHTML = '<i data-lucide="minimize" class="w-3.5 h-3.5"></i>';
-                }
-            } else {
-                // Đã thoát fullscreen
-                if (fsBtn) {
-                    fsBtn.setAttribute('data-tip', 'Toàn màn hình');
-                    fsBtn.innerHTML = '<i data-lucide="maximize" class="w-3.5 h-3.5"></i>';
-                }
-                videoContainer.classList.remove('hide-cursor');
+            if (isFS && fsBtn) {
+                fsBtn.setAttribute('data-tip', 'Thoát toàn màn hình');
+                fsBtn.innerHTML = '<i data-lucide="minimize" class="w-3.5 h-3.5"></i>';
+            } else if (fsBtn) {
+                fsBtn.setAttribute('data-tip', 'Toàn màn hình');
+                fsBtn.innerHTML = '<i data-lucide="maximize" class="w-3.5 h-3.5"></i>';
             }
             if (fsBtn) lucide.createIcons({ root: fsBtn });
         }
 
         document.addEventListener('fullscreenchange', handleFSChange);
         document.addEventListener('webkitfullscreenchange', handleFSChange);
-        document.addEventListener('mozfullscreenchange', handleFSChange);
-        document.addEventListener('MSFullscreenChange', handleFSChange);
 
-        // Hàm đóng/mở Dialog Thêm Nguồn
         const addDialog = document.getElementById('add-dialog');
-        const addDialogContent = document.getElementById('add-dialog-content');
 
         function openAddDialog() {
             addDialog.classList.remove('opacity-0', 'pointer-events-none');
-            addDialogContent.classList.replace('scale-95', 'scale-100');
         }
 
         function closeAddDialog() {
             addDialog.classList.add('opacity-0', 'pointer-events-none');
-            addDialogContent.classList.replace('scale-100', 'scale-95');
         }
 
-        // Đóng dialog khi click ra ngoài nền đen
         addDialog.addEventListener('click', (e) => {
-            if (e.target === addDialog) {
-                closeAddDialog();
-            }
+            if (e.target === addDialog) closeAddDialog();
         });
 
-        // Hàm Toast
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            const iconName = type === 'success' ? 'check' : 'alert-circle';
 
             toast.innerHTML = `
-                    <div class="toast-icon">
-                        <i data-lucide="${iconName}" class="w-4 h-4"></i>
-                    </div>
-                    <span>${message}</span>
-                `;
+                <div>
+                    <i data-lucide="${type === 'success' ? 'check' : 'alert-circle'}" class="w-4 h-4 inline"></i>
+                </div>
+                <span>${message}</span>
+            `;
             container.appendChild(toast);
             lucide.createIcons({ root: toast });
 
@@ -1184,27 +882,10 @@
             }, 3300);
         }
 
-        // Logic Parse
-        let globalEPGUrl = '';
-
         function parseM3U(text) {
-            // Auto-upgrade http to https for specific sources if needed
-            text = text.replace(/http:\/\/vietanhtv\.id\.vn/g, 'https://vietanhtv.id.vn');
-            text = text.replace(/http:\/\/xem\.hoiquan\.click/g, 'https://tinyurl.com/HoiQuanClick');
             const lines = text.split('\n');
             const channels = [];
             let currentChannel = null;
-
-            // Extract Global EPG URL from #EXTM3U line
-            const m3uHeader = lines.find(l => l.toUpperCase().startsWith('#EXTM3U'));
-            if (m3uHeader) {
-                const epgMatch = m3uHeader.match(/x-tvg-url="([^"]+)"/i) || m3uHeader.match(/url-tvg="([^"]+)"/i);
-                if (epgMatch && epgMatch[1]) {
-                    globalEPGUrl = epgMatch[1];
-                    console.log("Tìm thấy EPG URL từ playlist:", globalEPGUrl);
-                    fetchEPG(globalEPGUrl);
-                }
-            }
 
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -1219,210 +900,42 @@
                     };
 
                     const commaIndex = line.lastIndexOf(',');
-                    if (commaIndex !== -1) currentChannel.name = line.substring(commaIndex + 1).trim() || 'Kênh ẩn danh';
+                    if (commaIndex !== -1) currentChannel.name = line.substring(commaIndex + 1).trim();
 
                     const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-                    if (logoMatch && logoMatch[1]) currentChannel.logo = logoMatch[1];
+                    if (logoMatch) currentChannel.logo = logoMatch[1];
 
                     const groupMatch = line.match(/group-title="([^"]+)"/i);
-                    if (groupMatch && groupMatch[1]) currentChannel.group = groupMatch[1];
-
-                    const idMatch = line.match(/tvg-id="([^"]+)"/i);
-                    if (idMatch && idMatch[1]) currentChannel.id = idMatch[1];
-
-                    // Capture all catchup attributes
-                    const catchupMatch = line.match(/catchup="([^"]+)"/i);
-                    if (catchupMatch) currentChannel.props.catchup = catchupMatch[1];
-
-                    const catchupDaysMatch = line.match(/catchup-days="([^"]+)"/i);
-                    if (catchupDaysMatch) currentChannel.props.catchupDays = catchupDaysMatch[1];
-
-                    const catchupSourceMatch = line.match(/catchup-source="([^"]+)"/i);
-                    if (catchupSourceMatch) currentChannel.props.catchupSource = catchupSourceMatch[1];
-
-                } else if (line.toUpperCase().startsWith('#KODIPROP:')) {
-                    if (currentChannel) {
-                        const propLine = line.substring(10).trim();
-                        const equalIdx = propLine.indexOf('=');
-                        if (equalIdx !== -1) {
-                            const key = propLine.substring(0, equalIdx).trim();
-                            const val = propLine.substring(equalIdx + 1).trim();
-                            currentChannel.props[key] = val;
-                        }
-                    }
-                } else if (line.toUpperCase().startsWith('#EXTVLCOPT:')) {
-                    if (currentChannel) {
-                        const optLine = line.substring(11).trim();
-                        const equalIdx = optLine.indexOf('=');
-                        if (equalIdx !== -1) {
-                            const key = optLine.substring(0, equalIdx).trim();
-                            const val = optLine.substring(equalIdx + 1).trim();
-                            currentChannel.props[key] = val;
-                        }
-                    }
+                    if (groupMatch) currentChannel.group = groupMatch[1];
                 } else if (line !== '' && !line.startsWith('#')) {
                     if (currentChannel) {
                         currentChannel.url = line;
                         channels.push(currentChannel);
                         currentChannel = null;
-                    } else {
-                        channels.push({
-                            name: line.split('/').pop() || 'Luồng trực tiếp',
-                            logo: '',
-                            group: 'Khác',
-                            url: line,
-                            id: '',
-                            props: {}
-                        });
                     }
                 }
             }
             return channels;
         }
 
-        // Parse XSPF (XML Shareable Playlist Format)
-        function parseXSPF(text) {
-            const channels = [];
-            try {
-                const xml = new DOMParser().parseFromString(text, 'application/xml');
-                if (xml.querySelector('parsererror')) throw new Error('XSPF không hợp lệ');
-                const tracks = xml.querySelectorAll('track');
-                tracks.forEach(track => {
-                    const location = track.querySelector('location');
-                    if (!location || !location.textContent.trim()) return;
-                    const title = track.querySelector('title');
-                    const image = track.querySelector('image');
-                    const ext = track.querySelector('extension');
-                    let group = 'Khác';
-                    if (ext) {
-                        const groupAttr = ext.getAttribute('group-title') ||
-                            (ext.querySelector('group') && ext.querySelector('group').textContent);
-                        if (groupAttr) group = groupAttr;
-                    }
-                    channels.push({
-                        name: (title && title.textContent.trim()) || location.textContent.split('/').pop() || 'Kênh ẩn danh',
-                        logo: (image && image.textContent.trim()) || '',
-                        group: group,
-                        url: location.textContent.trim(),
-                        id: '',
-                        props: {}
-                    });
-                });
-            } catch (e) {
-                console.error('Lỗi parse XSPF:', e);
-            }
-            return channels;
-        }
-
-        // Parse danh sách URL thuần (mỗi dòng 1 link, dòng bắt đầu bằng # là comment/tên kênh)
-        function parsePlainList(text) {
-            const channels = [];
-            const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-            let pendingName = '';
-            for (const line of lines) {
-                if (line.startsWith('#')) {
-                    pendingName = line.replace(/^#+/, '').trim();
-                    continue;
-                }
-                if (/^https?:\/\//i.test(line) || /^rtmp:\/\//i.test(line) || /^rtsp:\/\//i.test(line)) {
-                    channels.push({
-                        name: pendingName || (line.split('/').pop() || 'Luồng trực tiếp'),
-                        logo: '',
-                        group: 'Khác',
-                        url: line,
-                        id: '',
-                        props: {}
-                    });
-                    pendingName = '';
-                }
-            }
-            return channels;
-        }
-
-        // Tự nhận diện định dạng nội dung playlist (JSON / M3U / XSPF / danh sách URL thuần)
-        // rồi trả về mảng kênh đã parse — dùng chung cho cả upload file lẫn tải qua URL.
         function autoParsePlaylist(content) {
             const trimmed = content.trim();
-            if (!trimmed) return [];
-            // JSON
-            if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-                try { return parseJSON(JSON.parse(trimmed)); }
-                catch (e) { /* không phải JSON hợp lệ, thử định dạng khác */ }
-            }
-            // XSPF (XML)
-            if (trimmed.startsWith('<?xml') || /<playlist[\s>]/i.test(trimmed.slice(0, 300))) {
-                const result = parseXSPF(trimmed);
-                if (result.length) return result;
-            }
-            // M3U / M3U8
-            if (trimmed.includes('#EXTM3U') || trimmed.toUpperCase().includes('EXTINF:')) {
+            if (trimmed.includes('#EXTM3U')) {
                 return parseM3U(trimmed);
             }
-            // Danh sách URL thuần (mỗi dòng 1 link)
-            return parsePlainList(trimmed);
+            return [];
         }
 
-        function parseJSON(data) {
-            // Auto-upgrade links to HTTPS
-            let dataStr = JSON.stringify(data);
-            dataStr = dataStr.replace(/http:\/\/vietanhtv\.id\.vn/g, 'https://vietanhtv.id.vn');
-            dataStr = dataStr.replace(/http:\/\/xem\.hoiquan\.click/g, 'https://tinyurl.com/HoiQuanClick');
-            data = JSON.parse(dataStr);
-
-            // Trường hợp 1: Định dạng Hailab Cloud (Có 'groups')
-            if (data && data.groups && Array.isArray(data.groups)) {
-                const channels = [];
-                data.groups.forEach(group => {
-                    if (group.channels && Array.isArray(group.channels)) {
-                        group.channels.forEach(channel => {
-                            // Lấy link stream đầu tiên có thể tìm thấy
-                            let streamUrl = '';
-                            if (channel.sources && channel.sources[0] &&
-                                channel.sources[0].contents && channel.sources[0].contents[0] &&
-                                channel.sources[0].contents[0].streams && channel.sources[0].contents[0].streams[0] &&
-                                channel.sources[0].contents[0].streams[0].stream_links &&
-                                channel.sources[0].contents[0].streams[0].stream_links[0]) {
-                                streamUrl = channel.sources[0].contents[0].streams[0].stream_links[0].url;
-                            }
-
-                            if (streamUrl) {
-                                channels.push({
-                                    name: channel.name || 'Kênh Live Sport',
-                                    url: streamUrl,
-                                    logo: (channel.image && channel.image.url) ? channel.image.url : '',
-                                    group: group.name || 'Bóng Đá'
-                                });
-                            }
-                        });
-                    }
-                });
-                return channels;
-            }
-
-            // Trường hợp 2: Định dạng List đơn giản hoặc JSON IPTV phổ thông
-            if (!Array.isArray(data)) data = data.channels || [];
-            return data.map(item => ({
-                name: item.name || item.title || item.channel || 'Kênh ẩn danh',
-                url: item.url || item.link || item.stream || '',
-                logo: item.logo || item.icon || item.tvg_logo || '',
-                group: item.group || item.category || 'Khác'
-            })).filter(item => item.url !== '');
-        }
-
-        // State for Category
         let currentCategory = 'Tất cả';
 
-        // Render List - Updated for flat list with filter
         function renderChannels(channelsToRender) {
             channelListEl.innerHTML = '';
-
             if (channelsToRender.length === 0) {
                 emptyStateEl.style.display = 'flex';
                 return;
             }
             emptyStateEl.style.display = 'none';
 
-            // Filter by active category if not 'Tất cả'
             let filtered = channelsToRender;
             if (currentCategory !== 'Tất cả') {
                 filtered = channelsToRender.filter(c => (c.group || 'Khác') === currentCategory);
@@ -1432,37 +945,33 @@
             filtered.forEach((channel) => {
                 const li = document.createElement('li');
                 const isPlaying = currentPlayingUrl === channel.url;
-
                 li.className = `channel-item relative flex items-center gap-3 p-2.5 rounded-2xl cursor-pointer select-none ${isPlaying ? 'active' : ''}`;
 
                 const logoHtml = channel.logo
-                    ? `<img src="${channel.logo}" alt="" class="w-full h-full object-contain" loading="lazy">`
+                    ? `<img src="${channel.logo}" alt="" class="w-full h-full object-contain">`
                     : `<i data-lucide="tv" class="w-4 h-4 text-white/20"></i>`;
 
                 li.innerHTML = `
-                        ${isPlaying ? '<div class="active-glow"></div>' : ''}
-                        <div class="w-16 aspect-video shrink-0 bg-white/5 rounded-lg border border-white/5 flex items-center justify-center overflow-hidden">
-                            ${logoHtml}
+                    ${isPlaying ? '<div class="active-glow"></div>' : ''}
+                    <div class="w-16 aspect-video shrink-0 bg-white/5 rounded-lg border border-white/5 flex items-center justify-center overflow-hidden">
+                        ${logoHtml}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-xs font-semibold leading-tight truncate ${isPlaying ? 'text-indigo-400' : 'text-white/80'}">
+                            ${channel.name}
+                        </h3>
+                        <p class="text-[9px] text-muted mt-0.5 uppercase">${channel.group || 'Khác'}</p>
+                    </div>
+                    ${isPlaying ? `
+                        <div class="playing-indicator mr-2">
+                            <div class="indicator-bar"></div>
+                            <div class="indicator-bar"></div>
+                            <div class="indicator-bar"></div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-xs font-semibold leading-tight truncate ${isPlaying ? 'text-indigo-400' : 'text-white/80'}">
-                                ${channel.name}
-                            </h3>
-                            <p class="text-[9px] text-muted mt-0.5 uppercase tracking-tighter">${channel.group || 'Khác'}</p>
-                        </div>
-                        ${isPlaying ? `
-                            <div class="playing-indicator mr-2">
-                                <div class="indicator-bar" style="animation-delay: 0s"></div>
-                                <div class="indicator-bar" style="animation-delay: 0.2s"></div>
-                                <div class="indicator-bar" style="animation-delay: 0.4s"></div>
-                            </div>
-                        ` : ''}
-                    `;
+                    ` : ''}
+                `;
 
-                li.onclick = (e) => {
-                    e.stopPropagation();
-                    playChannel(channel);
-                };
+                li.onclick = () => playChannel(channel);
                 fragment.appendChild(li);
             });
 
@@ -1470,7 +979,6 @@
             lucide.createIcons({ root: channelListEl });
         }
 
-        // Render Category Tabs
         function renderCategoryTabs() {
             const tabsContainer = document.getElementById('category-tabs');
             tabsContainer.innerHTML = '';
@@ -1479,7 +987,7 @@
 
             groups.forEach(group => {
                 const btn = document.createElement('button');
-                btn.className = `category-tab px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-white/5 ${currentCategory === group ? 'active' : 'bg-white/5 text-muted hover:bg-white/10'}`;
+                btn.className = `category-tab px-4 py-2 rounded-xl text-[10px] font-bold uppercase ${currentCategory === group ? 'active bg-indigo-500' : 'bg-white/5'}`;
                 btn.innerText = group;
                 btn.onclick = () => {
                     currentCategory = group;
@@ -1492,7 +1000,7 @@
 
         function processData(channels) {
             if (channels.length === 0) {
-                showToast('Không có dữ liệu hợp lệ trong file/link.', 'error');
+                showToast('Không tìm thấy kênh.', 'error');
                 return;
             }
             allChannels = channels;
@@ -1500,154 +1008,50 @@
             currentCategory = 'Tất cả';
             renderCategoryTabs();
             filterChannels();
-            showToast(`Đã tải thành công ${allChannels.length} kênh.`);
+            showToast(`✅ Đã tải ${allChannels.length} kênh!`);
         }
 
-        // Tải File Local
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function (e) {
                 try {
-                    const content = e.target.result;
-                    const channels = autoParsePlaylist(content);
-                    if (!channels.length) {
-                        showToast('Không tìm thấy kênh nào trong tệp. Kiểm tra định dạng (.m3u/.m3u8/.json/.xspf/.txt).', 'error');
-                        return;
-                    }
+                    const channels = autoParsePlaylist(e.target.result);
                     processData(channels);
-                } catch (error) { showToast('Lỗi đọc dữ liệu: ' + error.message, 'error'); }
+                } catch (error) {
+                    showToast('Lỗi: ' + error.message, 'error');
+                }
             };
             reader.readAsText(file);
             event.target.value = '';
         }
 
-        // Tải qua URL có sẵn
-        async function loadPredefinedUrl(url) {
-            document.getElementById('url-input').value = url;
-            closeAddDialog();
-            await loadFromUrl();
-        }
-
-        // Tải qua URL
         async function loadFromUrl() {
             const urlInput = document.getElementById('url-input').value.trim();
-            if (!urlInput) return showToast('Vui lòng dán đường dẫn URL!', 'error');
+            if (!urlInput) return showToast('Vui lòng dán URL!', 'error');
 
-            // === Phát hiện link luồng trực tiếp (video/audio) ===
-            // Các link này là stream cần phát, KHÔNG phải playlist IPTV cần parse
-            const isDirectM3U8 = /\.m3u8(\?|#|$)/i.test(urlInput);
-            const isDirectMPD = /\.mpd(\?|#|$)/i.test(urlInput);
-            const isDirectTS = /\.ts(\?|#|$)/i.test(urlInput) || /extension=ts/i.test(urlInput);
-            const isDirectMedia = /\.(flv|mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus)(\?|#|$)/i.test(urlInput);
-            const isRtmpRtsp = /^rtmps?:\/\//i.test(urlInput) || /^rtsp:\/\//i.test(urlInput);
+            showToast('Đang kết nối...', 'success');
 
-            if (isRtmpRtsp) {
-                closeAddDialog();
-                showToast('Trình duyệt không hỗ trợ phát trực tiếp RTMP/RTSP. Hãy dùng link HLS (.m3u8) hoặc DASH (.mpd) tương ứng nếu có.', 'error');
-                return;
+            try {
+                const response = await fetch(urlInput);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const text = await response.text();
+                const channels = autoParsePlaylist(text);
+                processData(channels);
+            } catch (e) {
+                showToast('Lỗi tải: ' + e.message, 'error');
             }
-
-            if (isDirectM3U8 || isDirectMPD || isDirectTS || isDirectMedia) {
-                closeAddDialog();
-                try {
-                    const pathParts = new URL(urlInput).pathname.split('/');
-                    var streamName = decodeURIComponent(pathParts.filter(p => p).pop() || 'Luồng trực tiếp');
-                    streamName = streamName.replace(/\.(m3u8|mpd|ts|flv|mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus)$/i, '');
-                } catch (e) {
-                    var streamName = 'Luồng trực tiếp';
-                }
-                showToast(`Đang phát: ${streamName}`, 'success');
-                playChannel({
-                    name: streamName,
-                    url: urlInput,
-                    logo: '',
-                    group: 'Phát trực tiếp',
-                    props: {}
-                });
-                return;
-            }
-
-            showToast('Đang kết nối URL...', 'success');
-            let text = '';
-
-            // Danh sách các proxy để thử nghiệm vượt rào CORS
-            // Ưu tiên dùng Worker riêng của bạn trước (ổn định, do bạn kiểm soát),
-            // sau đó mới thử trực tiếp và các proxy công cộng (có thể quá tải/bị chặn theo thời gian).
-            const isLocal = !urlInput.startsWith('http');
-            const proxies = isLocal ? [''] : [
-                ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []), // 0: Worker riêng (nếu đã cấu hình)
-                '', // 1: Thử trực tiếp
-                'https://api.allorigins.win/raw?url=', // 2: Proxy Allorigins phổ biến
-                'https://corsproxy.io/?url=', // 3: Corsproxy IO
-                'https://api.codetabs.com/v1/proxy?quest=', // 4: Codetabs proxy fallback
-            ];
-
-            let success = false;
-            let lastError = null;
-
-            for (const proxy of proxies) {
-                try {
-                    const fetchUrl = proxy ? proxy + encodeURIComponent(urlInput) : urlInput;
-                    const response = await fetch(fetchUrl, {
-                        // Thêm headers cơ bản để bypass một số rule chặn bot đơn giản
-                        headers: {
-                            'Accept': 'text/plain, */*'
-                        }
-                    });
-
-                    if (response.ok) {
-                        text = await response.text();
-                        // Kiểm tra cơ bản xem nội dung trả về có hợp lệ không
-                        // Chấp nhận M3U, JSON, XSPF (XML playlist), hoặc danh sách URL thuần
-                        const trimmedText = text.trim();
-                        const isM3U = text.includes('#EXTM3U') || text.toUpperCase().includes('EXTINF:');
-                        const isJSON = trimmedText.startsWith('{') || trimmedText.startsWith('[');
-                        const isXSPF = trimmedText.startsWith('<?xml') || /<playlist[\s>]/i.test(trimmedText.slice(0, 300));
-                        const isPlainList = /^https?:\/\//im.test(trimmedText) || /^rtmp:\/\//im.test(trimmedText) || /^rtsp:\/\//im.test(trimmedText);
-
-                        if (isM3U || isJSON || isXSPF || isPlainList) {
-                            success = true;
-                            console.log(`Đã tải nguồn phát thành công bằng luồng: ${proxy ? 'Proxy ' + proxy : 'Direct'}`);
-                            break; // Thoát vòng lặp nếu tải thành công
-                        } else {
-                            throw new Error('Nội dung trả về không phải định dạng nguồn phát hợp lệ.');
-                        }
-                    } else {
-                        throw new Error(`Mã lỗi HTTP: ${response.status}`);
-                    }
-                } catch (e) {
-                    lastError = e;
-                    console.warn(`Thử fetch thất bại với ${proxy ? 'proxy ' + proxy : 'luồng trực tiếp'}:`, e.message);
-                }
-            }
-
-            if (!success) {
-                console.error("Lỗi get link cuối cùng:", lastError);
-                return showToast('Website gốc đang chặn quyền truy cập (CORS) hoặc bị lỗi kĩ thuật.', 'error');
-            }
-
-            const parsedChannels = autoParsePlaylist(text);
-            if (!parsedChannels.length) {
-                return showToast('Không tìm thấy kênh nào trong nguồn phát này.', 'error');
-            }
-            processData(parsedChannels);
         }
 
-        // Tìm kiếm & Lọc theo Category
         function filterChannels() {
             const query = searchInput.value.toLowerCase().trim();
-            const clearBtn = document.getElementById('clear-search-btn');
-            if (clearBtn) clearBtn.classList.toggle('hidden', query === '');
             let filtered = allChannels;
 
-            // 1. Lọc theo Category hiện tại
             if (currentCategory !== 'Tất cả') {
                 filtered = filtered.filter(c => (c.group || 'Khác') === currentCategory);
             }
 
-            // 2. Lọc theo từ khóa tìm kiếm
             if (query) {
                 filtered = filtered.filter(c =>
                     c.name.toLowerCase().includes(query) ||
@@ -1655,68 +1059,8 @@
                 );
             }
 
-            // Render lại danh sách flat
-            renderChannelsExplicit(filtered);
+            renderChannels(filtered);
             channelCountEl.textContent = `${filtered.length} Kênh`;
-        }
-
-        // Hàm render list không filter (để dùng trong filterChannels)
-        function renderChannelsExplicit(channels) {
-            channelListEl.innerHTML = '';
-            if (channels.length === 0) {
-                emptyStateEl.style.display = 'flex';
-                return;
-            }
-            emptyStateEl.style.display = 'none';
-
-            const fragment = document.createDocumentFragment();
-            channels.forEach((channel) => {
-                const li = document.createElement('li');
-                const isPlaying = currentPlayingUrl === channel.url;
-                li.className = `channel-item relative flex items-center gap-3 p-2.5 rounded-2xl cursor-pointer select-none ${isPlaying ? 'active' : ''}`;
-
-                // Get Current Program
-                let currentProgram = null;
-                const epgId = findEPGId(channel.id || channel.name);
-                if (epgId && epgData.has(epgId)) {
-                    const now = new Date();
-                    currentProgram = epgData.get(epgId).find(p => p.start <= now && p.stop >= now);
-                }
-
-                const logoHtml = channel.logo
-                    ? `<img src="${channel.logo}" alt="" class="w-full h-full object-contain" loading="lazy">`
-                    : `<i data-lucide="tv" class="w-4 h-4 text-white/20"></i>`;
-
-                li.innerHTML = `
-                        ${isPlaying ? '<div class="active-glow"></div>' : ''}
-                        <div class="w-16 aspect-video shrink-0 bg-white/5 rounded-lg border border-white/5 flex items-center justify-center overflow-hidden">
-                            ${logoHtml}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-xs font-semibold leading-tight truncate ${isPlaying ? 'text-indigo-400' : 'text-white/80'}">
-                                ${channel.name}
-                            </h3>
-                            ${currentProgram ? `
-                                <p class="text-[10px] text-indigo-300/80 truncate mt-0.5 font-medium">
-                                    <span class="text-white/40 mr-1">•</span>${currentProgram.title}
-                                </p>
-                            ` : `
-                                <p class="text-[9px] text-muted mt-0.5 uppercase tracking-tighter">${channel.group || 'Khác'}</p>
-                            `}
-                        </div>
-                        ${isPlaying ? `
-                            <div class="playing-indicator mr-2">
-                                <div class="indicator-bar" style="animation-delay: 0s"></div>
-                                <div class="indicator-bar" style="animation-delay: 0.2s"></div>
-                                <div class="indicator-bar" style="animation-delay: 0.4s"></div>
-                            </div>
-                        ` : ''}
-                    `;
-                li.onclick = () => playChannel(channel);
-                fragment.appendChild(li);
-            });
-            channelListEl.appendChild(fragment);
-            lucide.createIcons({ root: channelListEl });
         }
 
         async function clearList() {
@@ -1726,32 +1070,48 @@
             renderCategoryTabs();
             filterChannels();
 
-            // Dọn dẹp tất cả intervals
-            if (window.stallInterval) { clearInterval(window.stallInterval); window.stallInterval = null; }
-            if (liveEdgeCheckInterval) { clearInterval(liveEdgeCheckInterval); liveEdgeCheckInterval = null; }
-            if (bufferCleanupInterval) { clearInterval(bufferCleanupInterval); bufferCleanupInterval = null; }
-            if (window.audioCheckInterval) { clearInterval(window.audioCheckInterval); window.audioCheckInterval = null; }
+            if (hlsInstance) hlsInstance.destroy();
+            if (shakaInstance) await shakaInstance.destroy();
 
-            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-            if (shakaInstance) { await shakaInstance.destroy(); shakaInstance = null; }
-            if (mpegtsInstance) { mpegtsInstance.destroy(); mpegtsInstance = null; }
-            videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
-
-            // Cleanup Blob URL
-            if (currentBlobUrl) {
-                URL.revokeObjectURL(currentBlobUrl);
-                currentBlobUrl = null;
-            }
-
+            videoPlayer.pause();
+            videoPlayer.removeAttribute('src');
+            videoPlayer.load();
             playerOverlay.style.opacity = '1';
             currentPlayingUrl = null;
+            showToast('Đã xóa.', 'success');
         }
 
-        // Helper to convert Base64/Base64Url to Hex for ClearKey
+        async function stopChannel() {
+            if (hlsInstance) hlsInstance.destroy();
+            if (shakaInstance) await shakaInstance.destroy();
+
+            videoPlayer.pause();
+            videoPlayer.removeAttribute('src');
+            videoPlayer.load();
+            currentPlayingUrl = null;
+            currentDRMConfig = null;
+            playerOverlay.style.opacity = '1';
+            loadingOverlay.classList.add('hidden');
+            filterChannels();
+            showToast('Đã dừng.', 'success');
+        }
+
+        function toggleFullscreen() {
+            const fsElement = document.fullscreenElement || document.webkitFullscreenElement;
+
+            if (!fsElement) {
+                const reqFS = videoContainer.requestFullscreen || videoContainer.webkitRequestFullscreen;
+                if (reqFS) reqFS.call(videoContainer);
+            } else {
+                const exitFS = document.exitFullscreen || document.webkitExitFullscreen;
+                if (exitFS) exitFS.call(document);
+            }
+        }
+
         function base64ToHex(base64) {
             if (!base64) return '';
             let b64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-            while (b64.length % 4 !== 0) b64 += '=';
+            while (b64.length % 4) b64 += '=';
             try {
                 const raw = atob(b64);
                 let result = '';
@@ -1761,1193 +1121,228 @@
                 }
                 return result.toLowerCase();
             } catch (e) {
-                console.error("Lỗi giải mã Base64:", e);
                 return '';
             }
         }
 
-        // === Blob URL tracker — để cleanup khi stop ===
-        let currentBlobUrl = null;
+        async function playDRMChannel(config) {
+            currentPlayingUrl = config.streamUrl;
+            currentDRMConfig = config;
 
-        // === Resolve PHP toggle — lưu trạng thái vào localStorage ===
-        let resolveEnabled = localStorage.getItem('resolveEnabled') === 'true'; // mặc định TẮT
-
-        function toggleResolve() {
-            resolveEnabled = !resolveEnabled;
-            localStorage.setItem('resolveEnabled', resolveEnabled);
-            const btn = document.getElementById('resolve-toggle-btn');
-            const dot = btn.querySelector('div');
-            if (resolveEnabled) {
-                btn.style.backgroundColor = '#22c55e';
-                dot.style.transform = 'translateX(1.25rem)';
-            } else {
-                btn.style.backgroundColor = '#444';
-                dot.style.transform = 'translateX(0)';
-            }
-            console.log(`[Settings] Resolve PHP: ${resolveEnabled ? 'BẬT' : 'TẮT'}`);
-        }
-
-
-
-        // === Stop Channel ===
-        async function stopChannel() {
-            // Dọn dẹp anti-distortion intervals
-            if (liveEdgeCheckInterval) { clearInterval(liveEdgeCheckInterval); liveEdgeCheckInterval = null; }
-            if (bufferCleanupInterval) { clearInterval(bufferCleanupInterval); bufferCleanupInterval = null; }
-            if (window.audioCheckInterval) { clearInterval(window.audioCheckInterval); window.audioCheckInterval = null; }
-
-            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-            if (shakaInstance) { await shakaInstance.destroy(); shakaInstance = null; }
-            if (mpegtsInstance) { mpegtsInstance.destroy(); mpegtsInstance = null; }
-            videoPlayer.pause();
-            videoPlayer.removeAttribute('src');
-            videoPlayer.load();
-
-            // Cleanup Blob URL
-            if (currentBlobUrl) {
-                URL.revokeObjectURL(currentBlobUrl);
-                currentBlobUrl = null;
-            }
-
-            currentPlayingUrl = null;
-            playerOverlay.style.opacity = '1';
-            loadingOverlay.classList.add('hidden');
-            document.getElementById('quality-selector').classList.add('hidden');
-            const epgBtn = document.getElementById('epg-toggle-btn');
-            if (epgBtn) epgBtn.classList.add('hidden');
-            const audioVis = document.getElementById('audio-visualizer');
-            if (audioVis) audioVis.classList.add('hidden');
-
-            filterChannels();
-            showToast('Đã dừng phát.', 'success');
-        }
-
-        function toggleFullscreen() {
-            const fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-
-            if (!fsElement) {
-                const reqFS = videoContainer.requestFullscreen || videoContainer.webkitRequestFullscreen || videoContainer.mozRequestFullScreen || videoContainer.msRequestFullscreen;
-                if (reqFS) {
-                    try {
-                        const promise = reqFS.call(videoContainer);
-                        if (promise) {
-                            promise.catch(() => {
-                                const docReqFS = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
-                                if (docReqFS) docReqFS.call(document.documentElement);
-                            });
-                        }
-                    } catch (e) {
-                        const docReqFS = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
-                        if (docReqFS) docReqFS.call(document.documentElement);
-                    }
-                } else if (videoPlayer.webkitEnterFullscreen) {
-                    // Fallback for iOS Safari which only supports fullscreen on the video element itself
-                    videoPlayer.webkitEnterFullscreen();
-                }
-            } else {
-                const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-                if (exitFS) {
-                    exitFS.call(document);
-                }
-            }
-        }
-
-
-        // === EPG Logic ===
-        function toggleEPG() {
-            isEPGPanelOpen = !isEPGPanelOpen;
-            const panel = document.getElementById('epg-panel');
-            const epgBtn = document.getElementById('epg-toggle-btn');
-            if (isEPGPanelOpen) {
-                panel.classList.add('open');
-                if (epgBtn) epgBtn.classList.add('hidden');
-                if (selectedChannelId) renderEPG(selectedChannelId);
-            } else {
-                panel.classList.remove('open');
-                if (epgBtn && selectedChannelId) epgBtn.classList.remove('hidden');
-            }
-        }
-
-        async function fetchEPG(url) {
-            if (epgFetchStatus === 'fetching' && !url) return;
-            epgFetchStatus = 'fetching';
-
-            // Ưu tiên đọc từ file local (đã được C# tải về, không có CORS)
-            const localUrl = 'http://data.local/epg.xml';
-            const remoteUrl = url || DEFAULT_EPG_URL;
-
-            let text = '';
-            let success = false;
-
-            // Thử local trước
-            try {
-                const localResponse = await fetch(localUrl);
-                if (localResponse.ok) {
-                    text = await localResponse.text();
-                    if (text.length > 1000 && text.includes('<?xml')) {
-                        success = true;
-                        console.log('[EPG] Đọc từ local epg.xml thành công, kích thước:', text.length);
-                    }
-                }
-            } catch (e) {
-                console.log('[EPG] Không có file local, thử tải từ mạng...');
-            }
-
-            // Nếu local thất bại, fetch trực tiếp (có thể bị CORS)
-            if (!success) {
-                console.log('[EPG] Đang tải EPG từ:', remoteUrl);
-                try {
-                    const response = await fetch(remoteUrl);
-                    if (response.ok) {
-                        text = await response.text();
-                        if (text.length > 1000 && text.includes('<?xml')) success = true;
-                    }
-                } catch (e) {
-                    console.warn('[EPG] Fetch trực tiếp thất bại:', e.message);
-                }
-            }
-
-            if (!success) {
-                epgFetchStatus = 'error';
-                showToast('Không thể tải lịch phát sóng. Vui lòng thử lại.', 'error');
-                return;
-            }
-
-            try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(text, "text/xml");
-
-                // Parse Channels
-                const channels = xmlDoc.getElementsByTagName('channel');
-                for (let ch of channels) {
-                    const id = ch.getAttribute('id');
-                    const name = ch.getElementsByTagName('display-name')[0]?.textContent || id;
-                    epgChannels.set(id, name);
-                }
-
-                // Parse Programmes
-                const programmes = xmlDoc.getElementsByTagName('programme');
-                const tempEpgData = new Map();
-
-                for (let prog of programmes) {
-                    const channelId = prog.getAttribute('channel');
-                    const startStr = prog.getAttribute('start');
-                    const stopStr = prog.getAttribute('stop');
-                    const title = prog.getElementsByTagName('title')[0]?.textContent || 'Không tên';
-                    const desc = prog.getElementsByTagName('desc')[0]?.textContent || '';
-
-                    if (!tempEpgData.has(channelId)) tempEpgData.set(channelId, []);
-
-                    tempEpgData.get(channelId).push({
-                        start: parseXMLTVDate(startStr),
-                        stop: parseXMLTVDate(stopStr),
-                        title,
-                        desc
-                    });
-                }
-
-                epgData = tempEpgData;
-                epgFetchStatus = 'success';
-                console.log(`Đã tải xong EPG cho ${epgData.size} kênh.`);
-                showToast(`Đã cập nhật lịch phát sóng (${epgData.size} kênh)`);
-
-                // Refresh UI if needed
-                filterChannels();
-            } catch (e) {
-                console.error("Lỗi parse XMLTV:", e);
-                epgFetchStatus = 'error';
-                showToast('Lỗi khi tải lịch phát sóng.', 'error');
-            }
-        }
-
-        // Bảng ánh xạ tên kênh thường gặp -> ID trong vnepg.site
-        const CHANNEL_NAME_MAP = {
-            'vtv1': 'vtv1hd', 'vtv2': 'vtv2hd', 'vtv3': 'vtv3hd',
-            'vtv4': 'vtv4hd', 'vtv5': 'vtv5hd', 'vtv6': 'vtv6hd',
-            'vtv7': 'vtv7hd', 'vtv8': 'vtv8hd', 'vtv9': 'vtv9hd',
-            'htv1': 'htv1hd', 'htv2': 'htv2hd', 'htv3': 'htv3hd',
-            'htv4': 'htv4hd', 'htv7': 'htv7hd', 'htv9': 'htv9hd',
-            'htv key': 'htv4hd',
-            'antv': 'antv', 'qpvn': 'qpvnhd', 'anninhTV': 'antv',
-            'vtc1': 'vtc1hd', 'vtc2': 'vtc2hd', 'vtc3': 'vtc3hd',
-            'sctv1': 'sctv1', 'sctv2': 'sctv2', 'sctv3': 'sctv3',
-            'sctv4': 'sctv4', 'sctv5': 'sctv5', 'sctv6': 'sctv6',
-            'sctv9': 'sctv9', 'sctv10': 'sctv10', 'sctv14': 'sctv14',
-            'vietnam today': 'vietnamtoday',
-            'htv thể thao': 'htvthethao', 'htvc du lịch': 'htvcdl',
-            'htvc ca nhạc': 'htvccanhac',
-            'thvl1': 'thvl1', 'thvl2': 'thvl2', 'thvl3': 'thvl3', 'thvl4': 'thvl4',
-            'truyền hình vĩnh long 1': 'thvl1',
-            'htvc tivi tết': 'htvcptt',
-            'youtv': 'youtv', 'youtvvn': 'youtv',
-            'hittv': 'hittv', 'hitv': 'hittv',
-            'fptv': 'fptv', 'htvc phim': 'htvcphim',
-        };
-
-        function findEPGId(id) {
-            if (!id) return null;
-            const cleanId = id.toLowerCase().trim();
-
-            // 1. Exact match on data key
-            if (epgData.has(id)) return id;
-
-            // 2. Case insensitive match on ID
-            for (let key of epgData.keys()) {
-                if (key.toLowerCase() === cleanId) return key;
-            }
-
-            // 3. Check hard-coded name map
-            const mapped = CHANNEL_NAME_MAP[cleanId];
-            if (mapped && epgData.has(mapped)) return mapped;
-
-            // 4. Match against display-name (for numeric/hash IDs in vnepg)
-            for (let [epgId, epgName] of epgChannels.entries()) {
-                if (epgName && epgName.toLowerCase().trim() === cleanId) return epgId;
-            }
-
-            // 5. Strip suffix hd/vn/hd2 from EPG ID and compare
-            for (let key of epgData.keys()) {
-                const stripped = key.toLowerCase().replace(/(hd2?|vn|sd)$/, '');
-                if (stripped === cleanId) return key;
-            }
-
-            // 6. Partial name match via display-name
-            for (let [epgId, epgName] of epgChannels.entries()) {
-                if (!epgName) continue;
-                const lName = epgName.toLowerCase();
-                // Must be a close match (not substring of much longer string)
-                if ((lName === cleanId) ||
-                    (lName.startsWith(cleanId) && lName.length - cleanId.length <= 4) ||
-                    (cleanId.startsWith(lName) && cleanId.length - lName.length <= 4)) {
-                    return epgId;
-                }
-            }
-
-            return null;
-        }
-
-        function parseXMLTVDate(str) {
-            // Format: 20240502070000 +0700
-            if (!str) return new Date();
-            const y = str.substring(0, 4);
-            const m = str.substring(4, 6) - 1;
-            const d = str.substring(6, 8);
-            const h = str.substring(8, 10);
-            const min = str.substring(10, 12);
-            const s = str.substring(12, 14);
-
-            // Handle timezone if exists
-            const date = new Date(Date.UTC(y, m, d, h, min, s));
-            const tzMatch = str.match(/([+-])(\d{2})(\d{2})$/);
-            if (tzMatch) {
-                const sign = tzMatch[1] === '+' ? 1 : -1;
-                const hours = parseInt(tzMatch[2]);
-                const minutes = parseInt(tzMatch[3]);
-                const offsetMs = (hours * 60 + minutes) * 60000 * sign;
-                return new Date(date.getTime() - offsetMs);
-            }
-            return date;
-        }
-
-        function renderEPG(channelIdOrName) {
-            const container = document.getElementById('epg-content');
-            container.innerHTML = '';
-
-            const epgId = findEPGId(channelIdOrName);
-
-            const titleEl = document.getElementById('epg-title');
-            if (titleEl) {
-                const channel = allChannels.find(c => (c.id === channelIdOrName || c.name === channelIdOrName));
-                if (channel) {
-                    titleEl.textContent = channel.name;
-                } else if (epgId && epgChannels.has(epgId)) {
-                    titleEl.textContent = epgChannels.get(epgId);
-                } else if (channelIdOrName) {
-                    titleEl.textContent = channelIdOrName;
-                } else {
-                    titleEl.textContent = 'Lịch Phát Sóng';
-                }
-            }
-
-            if (!epgId || !epgData.has(epgId)) {
-                container.innerHTML = `
-                        <div class="h-full flex flex-col items-center justify-center text-center opacity-40 p-6">
-                            <i data-lucide="info" class="w-8 h-8 mb-3"></i>
-                            <p class="text-xs">Không có dữ liệu lịch phát sóng cho: ${channelIdOrName || 'N/A'}</p>
-                            <p class="text-[10px] mt-2">Đang tải EPG từ: ${globalEPGUrl || DEFAULT_EPG_URL}</p>
-                        </div>
-                    `;
-                lucide.createIcons({ root: container });
-                return;
-            }
-
-            const programs = epgData.get(epgId).sort((a, b) => a.start - b.start);
-            const now = new Date();
-
-            // Only show programs for today/tomorrow
-            const filtered = programs.filter(p => {
-                const end = new Date(p.stop);
-                return end >= now;
-            }).slice(0, 50); // Limit to 50 programs
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<p class="text-center text-muted text-xs p-10">Hết lịch phát sóng hôm nay.</p>`;
-                return;
-            }
-
-            const fragment = document.createDocumentFragment();
-            filtered.forEach(p => {
-                const isCurrent = p.start <= now && p.stop >= now;
-                const item = document.createElement('div');
-                item.className = `epg-item p-3 mb-2 rounded-xl bg-white/[0.03] border border-white/5 ${isCurrent ? 'current' : ''}`;
-
-                const startTime = p.start.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-                const endTime = p.stop.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-
-                let progressHtml = '';
-                if (isCurrent) {
-                    const total = p.stop - p.start;
-                    const elapsed = now - p.start;
-                    const percent = Math.min(100, Math.max(0, (elapsed / total) * 100));
-                    progressHtml = `
-                            <div class="epg-progress">
-                                <div class="epg-progress-bar" style="width: ${percent}%"></div>
-                            </div>
-                        `;
-                }
-
-                item.innerHTML = `
-                        <div class="flex justify-between items-start mb-1">
-                            <span class="text-[10px] font-bold text-indigo-400">${startTime} - ${endTime}</span>
-                            ${isCurrent ? '<span class="px-1.5 py-0.5 rounded-md bg-indigo-500 text-[8px] font-bold text-white animate-pulse">LIVE</span>' : ''}
-                        </div>
-                        <h4 class="text-xs font-semibold text-white/90 mb-1 leading-snug">${p.title}</h4>
-                        ${p.desc ? `<p class="text-[10px] text-muted line-clamp-2">${p.desc}</p>` : ''}
-                        ${progressHtml}
-                    `;
-                fragment.appendChild(item);
-            });
-
-            container.appendChild(fragment);
-            // Scroll to current
-            setTimeout(() => {
-                const current = container.querySelector('.epg-item.current');
-                if (current) current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-        }
-
-
-        // === Helper: Hiện trình giả lập Audio ===
-        function showAudioVisualizer(channel) {
-            const audioVis = document.getElementById('audio-visualizer');
-            if (!audioVis || !audioVis.classList.contains('hidden')) return;
-
-            const titleEl = document.getElementById('audio-visualizer-title');
-            if (titleEl) titleEl.textContent = channel.name || 'Radio Stream';
-
-            const logoEl = document.getElementById('audio-visualizer-logo');
-            const iconEl = document.getElementById('audio-visualizer-icon');
-            if (channel.logo) {
-                logoEl.src = channel.logo;
-                logoEl.classList.remove('hidden');
-            } else {
-                logoEl.classList.add('hidden');
-                logoEl.src = '';
-            }
-            if (iconEl) iconEl.classList.remove('hidden');
-
-            audioVis.classList.remove('hidden');
-            lucide.createIcons({ root: audioVis });
-
-            // Cập nhật quality selector thành "Audio"
-            const qualitySelector = document.getElementById('quality-selector');
-            if (qualitySelector) {
-                qualitySelector.innerHTML = '<option value="audio">Audio</option>';
-                qualitySelector.classList.remove('hidden');
-            }
-        }
-
-        // Improved Play Channel
-        async function playChannel(channel) {
-            selectedChannelId = channel.id || channel.name;
-            const epgBtn = document.getElementById('epg-toggle-btn');
-            if (!isEPGPanelOpen && epgBtn) {
-                epgBtn.classList.remove('hidden'); // Show if panel is closed
-            }
-
-            if (isEPGPanelOpen) renderEPG(selectedChannelId);
-
-            if (window.stallTimeout) clearTimeout(window.stallTimeout);
-            if (window.stallInterval) clearInterval(window.stallInterval);
-            const url = channel.url;
-            currentPlayingUrl = url;
-
-            // Stall detection — chỉ reload khi stall nghiêm trọng (không nudge để tránh audio pop)
-            let lastVideoTime = -1;
-            let stallCount = 0;
-            window.stallInterval = setInterval(() => {
-                if (!videoPlayer.paused && currentPlayingUrl === url) {
-                    if (videoPlayer.currentTime === lastVideoTime) {
-                        stallCount++;
-                        // Stall nghiêm trọng ~10s → reload kênh
-                        if (stallCount >= 20) {
-                            console.warn("Serious stall detected, forced reload...");
-                            stallCount = 0;
-                            playChannel(channel);
-                        }
-                    } else {
-                        stallCount = 0;
-                    }
-                    lastVideoTime = videoPlayer.currentTime;
-                }
-            }, 500);
-
-            // UI Update
             playerOverlay.style.opacity = '0';
             loadingOverlay.classList.remove('hidden');
-            document.getElementById('quality-selector').classList.add('hidden');
-            videoPlayer.classList.remove('is-live');
-            const audioVis = document.getElementById('audio-visualizer');
-            if (audioVis) audioVis.classList.add('hidden');
+            const drmStatus = document.getElementById('drm-status');
+            if (drmStatus) drmStatus.classList.remove('hidden');
 
-            // Force preservesPitch to true to prevent audio distortion when playbackRate changes
-            videoPlayer.preservesPitch = true;
-            if ('mozPreservesPitch' in videoPlayer) videoPlayer.mozPreservesPitch = true;
-            if ('webkitPreservesPitch' in videoPlayer) videoPlayer.webkitPreservesPitch = true;
+            if (shakaInstance) await shakaInstance.destroy();
+            if (hlsInstance) hlsInstance.destroy();
 
-            // Highlight in list
-            filterChannels();
-
-            // Cleanup old stream & anti-distortion intervals
-            if (liveEdgeCheckInterval) { clearInterval(liveEdgeCheckInterval); liveEdgeCheckInterval = null; }
-            if (bufferCleanupInterval) { clearInterval(bufferCleanupInterval); bufferCleanupInterval = null; }
-            if (window.audioCheckInterval) { clearInterval(window.audioCheckInterval); window.audioCheckInterval = null; }
-            if (window._audioDriftInterval) { clearInterval(window._audioDriftInterval); window._audioDriftInterval = null; }
-            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-            if (shakaInstance) {
-                await shakaInstance.destroy();
-                shakaInstance = null;
-            }
-            if (mpegtsInstance) { mpegtsInstance.destroy(); mpegtsInstance = null; }
             videoPlayer.pause();
             videoPlayer.removeAttribute('src');
             videoPlayer.load();
 
-            // --- Resolve proxy URL (dùng XHR + Blob URL) ---
-            let resolvedUrl = url;
-            const needsResolve = url.includes('.php') || url.includes('vietanhtv') || url.includes('tv360') || url.includes('vieon') || url.includes('hoiquan') || url.includes('/play/') || url.includes('dpdns.org');
-            if (needsResolve) {
-                if (resolveEnabled) {
-                    // === CHẾ ĐỘ BẬT: Fetch + parse response để tìm stream URL ===
-                    loadingOverlay.classList.remove('hidden');
-                    const statusEl = document.getElementById('resolve-status');
-                    if (statusEl) statusEl.classList.remove('hidden');
-
-                    // Bước 1: Dùng XHR trước (vượt CORS khi mở từ file://)
-                    let responseText = null;
-                    let finalUrl = null;
-                    try {
-                        const xhrResult = await xhrFetchText(url);
-                        responseText = xhrResult.text;
-                        finalUrl = xhrResult.finalUrl || url;
-                        console.log(`[Resolver] XHR OK, final URL: ${finalUrl.substring(0,100)}`);
-                    } catch (e) {
-                        console.warn('[Resolver] XHR thất bại, thử fetch:', e.message);
-                        try {
-                            const resp = await fetch(url, {
-                                headers: {
-                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                                    'Accept': '*/*',
-                                    'Referer': 'https://vietanhtv.id.vn/',
-                                },
-                                redirect: 'follow',
-                            });
-                            if (resp.ok) {
-                                responseText = await resp.text();
-                                finalUrl = resp.url;
-                                console.log(`[Resolver] Fetch OK, final URL: ${finalUrl.substring(0,100)}`);
-                            }
-                        } catch (e2) {
-                            console.warn('[Resolver] Fetch cũng thất bại:', e2.message);
-                        }
-                    }
-
-                    if (responseText && responseText.length > 5) {
-                        const parsed = parseResponseForStream(responseText, finalUrl || url, url);
-                        if (parsed) {
-                            if (parsed.startsWith('http')) {
-                                resolvedUrl = parsed;
-                                console.log(`[Resolver] ✅ Tìm thấy stream URL: ${resolvedUrl.substring(0,120)}`);
-                            } else {
-                                try {
-                                    const isM3U = parsed.includes('#EXTM3U') || parsed.includes('#EXTINF');
-                                    const isJSON = parsed.trim().startsWith('{') || parsed.trim().startsWith('[');
-                                    const mimeType = isM3U ? 'application/vnd.apple.mpegurl' :
-                                                    isJSON ? 'application/json' : 'text/plain';
-                                    const blob = new Blob([parsed], { type: mimeType });
-                                    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-                                    currentBlobUrl = URL.createObjectURL(blob);
-                                    resolvedUrl = currentBlobUrl;
-                                    console.log(`[Resolver] ✅ Đã tạo Blob URL (${mimeType}): ${resolvedUrl.substring(0,50)}`);
-                                } catch (e) {
-                                    console.warn('[Resolver] Không thể tạo Blob URL:', e.message);
-                                }
-                            }
-                        } else {
-                            if (finalUrl && finalUrl !== url && /\.(m3u8|mpd|ts)(\?|#|$)/i.test(finalUrl)) {
-                                resolvedUrl = finalUrl;
-                                console.log(`[Resolver] ✅ Dùng finalUrl sau redirect: ${resolvedUrl.substring(0,120)}`);
-                            } else if (finalUrl && finalUrl !== url && (finalUrl.includes(':2086/') || finalUrl.includes(':2087/') || finalUrl.includes('/play/'))) {
-                                resolvedUrl = finalUrl;
-                                console.log(`[Resolver] ✅ Dùng finalUrl raw stream: ${resolvedUrl.substring(0,120)}`);
-                            } else if (responseText.includes('#EXTM3U') || responseText.includes('#EXTINF')) {
-                                try {
-                                    const blob = new Blob([responseText], { type: 'application/vnd.apple.mpegurl' });
-                                    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-                                    currentBlobUrl = URL.createObjectURL(blob);
-                                    resolvedUrl = currentBlobUrl;
-                                    console.log(`[Resolver] ✅ Dùng responseText làm M3U playlist (Blob URL)`);
-                                } catch (e) {
-                                    console.warn('[Resolver] Không thể tạo Blob URL từ responseText:', e.message);
-                                }
-                            }
-                        }
-                    } else {
-                        console.warn('[Resolver] ❌ XHR/Fetch thất bại, thử CORS proxy...');
-                        // === PHƯƠNG ÁN 3: CORS Proxy (cho HTTPS deployment) ===
-                        const CORS_PROXIES = [
-                            ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
-                            'https://api.allorigins.win/raw?url=',
-                            'https://corsproxy.io/?url=',
-                            'https://api.codetabs.com/v1/proxy?quest=',
-                        ];
-                        for (const proxy of CORS_PROXIES) {
-                            try {
-                                const proxyUrl = proxy + encodeURIComponent(url);
-                                const resp = await fetch(proxyUrl, { redirect: 'follow' });
-                                if (resp.ok) {
-                                    const text = await resp.text();
-                                    if (text && text.length > 5) {
-                                        const parsed = parseResponseForStream(text, url, url);
-                                        if (parsed) {
-                                            if (parsed.startsWith('http')) {
-                                                resolvedUrl = parsed;
-                                                console.log(`[Resolver] ✅ Proxy ${proxy} → stream URL: ${resolvedUrl.substring(0,120)}`);
-                                                break;
-                                            } else {
-                                                // Tạo Blob URL
-                                                const isM3U = parsed.includes('#EXTM3U') || parsed.includes('#EXTINF');
-                                                const mimeType = isM3U ? 'application/vnd.apple.mpegurl' : 'text/plain';
-                                                const blob = new Blob([parsed], { type: mimeType });
-                                                if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-                                                currentBlobUrl = URL.createObjectURL(blob);
-                                                resolvedUrl = currentBlobUrl;
-                                                console.log(`[Resolver] ✅ Proxy ${proxy} → Blob URL: ${resolvedUrl.substring(0,50)}`);
-                                                break;
-                                            }
-                                        }
-                                        if (text.includes('#EXTM3U') || text.includes('#EXTINF')) {
-                                            const blob = new Blob([text], { type: 'application/vnd.apple.mpegurl' });
-                                            if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-                                            currentBlobUrl = URL.createObjectURL(blob);
-                                            resolvedUrl = currentBlobUrl;
-                                            console.log(`[Resolver] ✅ Proxy ${proxy} → M3U Blob URL`);
-                                            break;
-                                        }
-                                    }
-                                }
-                            } catch (e) {
-                                console.warn(`[Resolver] Proxy ${proxy} failed:`, e.message);
-                            }
-                        }
-                    }
-
-                    if (statusEl) statusEl.classList.add('hidden');
-                    console.log(`[Resolver] Kết quả cuối: ${url.substring(0,80)} → ${String(resolvedUrl).substring(0,120)}`);
-                } else {
-                    // === CHẾ ĐỘ TẮT: Chỉ follow redirect, không parse ===
-                    console.log('[Resolver] Resolve TẮT, chỉ follow redirect...');
-                    try {
-                        const xhrResult = await xhrFetchText(url);
-                        const finalUrl = xhrResult.finalUrl || url;
-                        if (finalUrl !== url && /\.(m3u8|mpd|ts)(\?|#|$)/i.test(finalUrl)) {
-                            resolvedUrl = finalUrl;
-                            console.log(`[Resolver] ✅ Redirect đến: ${resolvedUrl.substring(0,120)}`);
-                        } else if (xhrResult.text && xhrResult.text.length > 5) {
-                            // Không redirect tới stream, thử parse nhanh
-                            const parsed = parseResponseForStream(xhrResult.text, finalUrl, url);
-                            if (parsed && parsed.startsWith('http')) {
-                                resolvedUrl = parsed;
-                                console.log(`[Resolver] ✅ Tìm thấy trong response: ${resolvedUrl.substring(0,120)}`);
-                            }
-                        }
-                    } catch (e) {
-                        console.warn('[Resolver] XHR redirect thất bại, thử fetch:', e.message);
-                        try {
-                            const resp = await fetch(url, {
-                                headers: {
-                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                                    'Accept': '*/*',
-                                },
-                                redirect: 'follow',
-                            });
-                            if (resp.ok) {
-                                const finalUrl = resp.url;
-                                if (finalUrl !== url) {
-                                    resolvedUrl = finalUrl;
-                                    console.log(`[Resolver] ✅ Fetch redirect đến: ${resolvedUrl.substring(0,120)}`);
-                                }
-                            }
-                        } catch (e2) {
-                            console.warn('[Resolver] Fetch redirect cũng thất bại:', e2.message);
-                        }
-                    }
-                }
-            }
-
-            const isMPD = resolvedUrl.includes('.mpd') || (channel.props && channel.props['inputstream.adaptive.manifest_type'] === 'mpd');
-            const isRawTS = /\.ts(\?|$)/i.test(resolvedUrl) || /extension=ts/i.test(resolvedUrl) ||
-                            resolvedUrl.includes(':2086/') || resolvedUrl.includes(':2087/') ||
-                            resolvedUrl.includes('/play/');
-            const isFLV = /\.flv(\?|#|$)/i.test(resolvedUrl) || /extension=flv/i.test(resolvedUrl);
-            const isRtmpOrRtsp = /^rtmps?:\/\//i.test(resolvedUrl) || /^rtsp:\/\//i.test(resolvedUrl);
-
-            // Trình duyệt không thể phát RTMP/RTSP trực tiếp (cần plugin/native app) — báo lỗi rõ ràng thay vì treo màn hình
-            if (isRtmpOrRtsp) {
-                loadingOverlay.classList.add('hidden');
-                showToast('Định dạng RTMP/RTSP không được trình duyệt hỗ trợ. Cần link HLS (.m3u8) hoặc DASH (.mpd) thay thế.', 'error');
-                return;
-            }
-
-            // Lưu URL gốc (trước khi bị bọc qua proxy) — cần dùng để hỏi license server ClearKey động
-            const originalStreamUrl = resolvedUrl;
-
-            // Kênh cần User-Agent/Referer riêng -> định tuyến qua Cloudflare Worker proxy
-            // (trình duyệt chặn JS ghi đè header này, nên phải nhờ server gọi hộ)
-            const channelHeaders = getChannelHeaders(channel);
-            if (PROXY_BASE_URL && (channelHeaders.userAgent || channelHeaders.referer) && /^https?:\/\//i.test(resolvedUrl)) {
-                console.log('[Headers] Áp dụng UA/Referer riêng qua proxy:', channelHeaders);
-                resolvedUrl = buildProxyUrl(resolvedUrl, channelHeaders.userAgent, channelHeaders.referer);
-            } else if (!PROXY_BASE_URL && (channelHeaders.userAgent || channelHeaders.referer)) {
-                console.warn('[Headers] Kênh cần UA/Referer riêng nhưng PROXY_BASE_URL chưa cấu hình — có thể phát lỗi.');
-            }
-
-            // --- Case 1: DASH / MPD (Using Shaka Player) ---
-            if (typeof shaka !== 'undefined' && isMPD && shaka.Player.isBrowserSupported()) {
+            // === Shaka Player for DASH + DRM ===
+            if (typeof shaka !== 'undefined' && shaka.Player.isBrowserSupported()) {
                 shakaInstance = new shaka.Player(videoPlayer);
 
-                // Handle DRM
-                const drmType = channel.props && channel.props['inputstream.adaptive.license_type'];
-                const licenseKey = channel.props && channel.props['inputstream.adaptive.license_key'];
+                const drmServers = {};
+                const clearKeys = {};
 
-                if (drmType === 'widevine' && licenseKey) {
-                    // Widevine — cấu hình license server cho Shaka
-                    shakaInstance.configure({
-                        drm: {
-                            servers: {
-                                'com.widevine.alpha': licenseKey
-                            }
-                        }
-                    });
-                    console.log('[DRM] Configured Widevine license server:', licenseKey);
-                } else if (drmType === 'clearkey' && licenseKey) {
-                    let keyString = licenseKey;
-                    const clearKeys = {};
+                // === Widevine Setup ===
+                if (config.drmType === 'widevine' && config.licenseUrl) {
+                    drmServers['com.widevine.alpha'] = config.licenseUrl;
+                    showToast('🔒 Widevine DRM AutoKey...', 'success');
+                }
 
-                    // TH0: resolvedUrl là JSON
-                    if (resolvedUrl && (resolvedUrl.startsWith('{') || resolvedUrl.startsWith('['))) {
+                // === PlayReady Setup ===
+                else if (config.drmType === 'playready' && config.licenseUrl) {
+                    drmServers['com.microsoft.playready'] = config.licenseUrl;
+                    showToast('🔒 PlayReady DRM AutoKey...', 'success');
+                }
+
+                // === ClearKey Setup ===
+                else if (config.drmType === 'clearkey') {
+                    if (config.licenseUrl) {
+                        // Fetch key from license server
                         try {
-                            const proxyData = JSON.parse(resolvedUrl);
-                            let kid = proxyData.kid || (proxyData.keys && proxyData.keys[0]?.kid);
-                            let key = proxyData.k || (proxyData.keys && proxyData.keys[0]?.k);
-                            const streamUrl = proxyData.url || proxyData.data?.url || proxyData.stream?.url || proxyData.location;
-                            if (streamUrl) resolvedUrl = streamUrl;
-                            if (kid && key) {
-                                clearKeys[base64ToHex(kid)] = base64ToHex(key);
-                                console.log(`[ClearKey] Extracted from proxy JSON: KID=${kid}, KEY=${key}`);
-                            }
-                        } catch(e) { /* ignore */ }
-                    }
-
-                    // TH1: license_key là URL (license server trả về key động — kiểu "AutoKey")
-                    // Nhiều server loại này dùng CHUNG 1 URL cho mọi kênh, và cần biết đang xin
-                    // key cho stream nào -> thử lần lượt vài kiểu ghép tham số phổ biến.
-                    if (Object.keys(clearKeys).length === 0 && keyString && (keyString.startsWith('http://') || keyString.startsWith('https://'))) {
-                        const userAgent = (channel.props && (channel.props['http-user-agent'] || channel.props['User-Agent'])) || 'Dalvik/2.1.0';
-                        const baseKeyUrl = keyString.endsWith('/') ? keyString : keyString + '/';
-
-                        // Các dạng URL license server hay gặp, thử tuần tự tới khi ra key hợp lệ
-                        const candidateUrls = [
-                            keyString, // Dùng nguyên văn (trường hợp URL đã đầy đủ tham số)
-                            baseKeyUrl + encodeURIComponent(originalStreamUrl), // .../AutoKey/<mpd đã encode>
-                            baseKeyUrl + originalStreamUrl, // .../AutoKey/<mpd nguyên văn>
-                            keyString + (keyString.includes('?') ? '&' : '?') + 'url=' + encodeURIComponent(originalStreamUrl), // ...?url=<mpd>
-                        ];
-
-                        // Thử fetch trực tiếp, nếu bị chặn CORS thì thử qua các proxy dự phòng
-                        const licenseProxies = [
-                            '', // trực tiếp
-                            ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
-                            'https://api.allorigins.win/raw?url=',
-                            'https://corsproxy.io/?url=',
-                            'https://api.codetabs.com/v1/proxy?quest=',
-                        ];
-
-                        outer:
-                        for (const candidate of candidateUrls) {
-                            for (const proxy of licenseProxies) {
-                                try {
-                                    const fetchUrl = proxy ? proxy + encodeURIComponent(candidate) : candidate;
-                                    const keyResp = await fetch(fetchUrl, {
-                                        headers: proxy ? {} : { 'User-Agent': userAgent, 'Accept': '*/*' }
+                            const keyResp = await fetch(config.licenseUrl + '?url=' + encodeURIComponent(config.streamUrl), {
+                                headers: config.userAgent ? { 'User-Agent': config.userAgent } : {}
+                            });
+                            if (keyResp.ok) {
+                                const keyText = await keyResp.text();
+                                const keyData = JSON.parse(keyText);
+                                if (keyData.keys) {
+                                    keyData.keys.forEach(k => {
+                                        clearKeys[base64ToHex(k.kid)] = base64ToHex(k.k);
                                     });
-                                    if (!keyResp.ok) continue;
-                                    const keyText = await keyResp.text();
-                                    if (!keyText || keyText.length < 5) continue;
-
-                                    try {
-                                        const keyData = JSON.parse(keyText);
-                                        if (keyData.keys && Array.isArray(keyData.keys)) {
-                                            keyData.keys.forEach(k => {
-                                                if (k.kid && k.k) clearKeys[base64ToHex(k.kid)] = base64ToHex(k.k);
-                                            });
-                                        } else if (keyData.kid && keyData.k) {
-                                            clearKeys[base64ToHex(keyData.kid)] = base64ToHex(keyData.k);
-                                        }
-                                    } catch(e) {
-                                        const trimmed = keyText.trim();
-                                        if (trimmed.includes(':')) {
-                                            const parts = trimmed.split(':');
-                                            if (parts.length === 2 && /^[0-9a-fA-F]{16,64}$/.test(parts[0]) && /^[0-9a-fA-F]{16,64}$/.test(parts[1])) {
-                                                clearKeys[parts[0].toLowerCase()] = parts[1].toLowerCase();
-                                            }
-                                        }
-                                    }
-
-                                    if (Object.keys(clearKeys).length > 0) {
-                                        console.log(`[ClearKey] ✅ Lấy key thành công từ: ${fetchUrl}`, clearKeys);
-                                        break outer;
-                                    }
-                                } catch(e) {
-                                    // Thử phương án tiếp theo
                                 }
                             }
+                        } catch (e) {
+                            console.warn('Failed to fetch ClearKey:', e);
                         }
-
-                        if (Object.keys(clearKeys).length === 0) {
-                            console.warn(`[ClearKey] Không lấy được key động từ ${keyString} (đã thử ${candidateUrls.length} kiểu URL x ${licenseProxies.length} proxy).`);
-                        }
-                    }
-
-                    // TH2: key tĩnh (JSON hoặc hex)
-                    if (Object.keys(clearKeys).length === 0 && keyString) {
+                    } else if (config.clearKey) {
+                        // Parse static key
                         try {
-                            const keyData = JSON.parse(keyString);
-                            if (keyData.keys && Array.isArray(keyData.keys)) {
-                                keyData.keys.forEach(k => {
+                            const keyData = JSON.parse(config.clearKey);
+                            if (keyData.kids && Array.isArray(keyData.kids)) {
+                                keyData.kids.forEach(k => {
                                     clearKeys[base64ToHex(k.kid)] = base64ToHex(k.k);
                                 });
                             } else if (keyData.kid && keyData.k) {
                                 clearKeys[base64ToHex(keyData.kid)] = base64ToHex(keyData.k);
                             }
                         } catch (e) {
-                            if (keyString && keyString.includes(':')) {
-                                const parts = keyString.split(':');
-                                if (parts.length === 2 && /^[0-9a-fA-F]+$/.test(parts[0]) && /^[0-9a-fA-F]+$/.test(parts[1])) {
-                                    clearKeys[parts[0].toLowerCase()] = parts[1].toLowerCase();
-                                }
+                            if (config.clearKey.includes(':')) {
+                                const [kid, key] = config.clearKey.split(':');
+                                clearKeys[kid.toLowerCase()] = key.toLowerCase();
                             }
                         }
                     }
 
                     if (Object.keys(clearKeys).length > 0) {
-                        shakaInstance.configure({
-                            drm: {
-                                clearKeys: clearKeys,
-                                servers: {},
-                                advanced: {
-                                    'com.widevine.alpha': { serverCertificate: null },
-                                    'com.microsoft.playready': { serverCertificate: null }
-                                }
-                            }
-                        });
-                        console.log("Configured ClearKey DRM (hex):", clearKeys);
+                        console.log('🔐 ClearKey configured:', clearKeys);
                     }
+
+                    showToast('🔒 ClearKey DRM AutoKey...', 'success');
                 }
+
+                shakaInstance.configure({
+                    drm: {
+                        servers: drmServers,
+                        clearKeys: clearKeys,
+                        advanced: {
+                            'com.widevine.alpha': {
+                                serverCertificate: null
+                            },
+                            'com.microsoft.playready': {
+                                serverCertificate: null
+                            }
+                        }
+                    }
+                });
 
                 shakaInstance.addEventListener('error', (event) => {
                     console.error('Shaka Error:', event.detail);
+                    showToast('❌ DRM Error: ' + event.detail.message, 'error');
                 });
 
                 try {
-                    await shakaInstance.load(resolvedUrl);
+                    await shakaInstance.load(config.streamUrl);
                     videoPlayer.play();
 
-                    // Live stream handling
                     if (shakaInstance.isLive()) {
                         videoPlayer.classList.add('is-live');
                         const seekRange = shakaInstance.seekRange();
                         videoPlayer.currentTime = seekRange.end;
-                    } else {
-                        videoPlayer.classList.remove('is-live');
                     }
 
-                    // Populate quality selector from Shaka variant tracks
                     const qualitySelector = document.getElementById('quality-selector');
                     const tracks = shakaInstance.getVariantTracks();
-                    const uniqueHeights = [...new Set(tracks.map(t => t.height).filter(h => h > 0))].sort((a, b) => b - a);
-                    if (uniqueHeights.length > 1) {
-                        const activeTrack = tracks.find(t => t.active);
-                        const activeH = activeTrack ? activeTrack.height : uniqueHeights[0];
-                        qualitySelector.innerHTML = `<option value="auto">Auto${activeH ? ' (' + activeH + 'p)' : ''}</option>`;
-                        uniqueHeights.forEach(h => {
+                    const heights = [...new Set(tracks.map(t => t.height).filter(h => h > 0))].sort((a, b) => b - a);
+
+                    if (heights.length > 1) {
+                        qualitySelector.innerHTML = '<option value="auto">Auto</option>';
+                        heights.forEach(h => {
                             const opt = document.createElement('option');
                             opt.value = h;
                             opt.textContent = `${h}p`;
                             qualitySelector.appendChild(opt);
                         });
                         qualitySelector.classList.remove('hidden');
-
-                        shakaInstance.addEventListener('adaptation', () => {
-                            if (!shakaInstance) return;
-                            const abrConfig = shakaInstance.getConfiguration().abr;
-                            if (abrConfig && abrConfig.enabled && qualitySelector.value === 'auto') {
-                                const currentTrack = shakaInstance.getVariantTracks().find(t => t.active);
-                                const h = currentTrack ? currentTrack.height : 0;
-                                const autoOpt = qualitySelector.querySelector('option[value="auto"]');
-                                if (autoOpt) {
-                                    autoOpt.textContent = h ? `Auto (${h}p)` : 'Auto';
-                                }
-                            }
-                        });
-                    } else {
-                        const h = uniqueHeights.length === 1 ? uniqueHeights[0] : 0;
-                        qualitySelector.innerHTML = `<option value="${h || 0}" id="single-quality-opt">${h ? h + 'p' : 'Đang tải...'}</option>`;
-                        qualitySelector.classList.remove('hidden');
-
-                        videoPlayer.addEventListener('resize', function updateRes() {
-                            const realHeight = videoPlayer.videoHeight;
-                            const opt = document.getElementById('single-quality-opt');
-                            if (realHeight && opt && opt.textContent === 'Đang tải...') {
-                                opt.textContent = `${realHeight}p`;
-                                videoPlayer.removeEventListener('resize', updateRes);
-                            }
-                        });
                     }
                 } catch (e) {
-                    showToast('Lỗi phát DASH/DRM: ' + e.message, 'error');
+                    showToast('❌ DRM Playback Error: ' + e.message, 'error');
                 }
 
-                // === Shaka Live Edge Recovery ===
-                if (shakaInstance && shakaInstance.isLive && shakaInstance.isLive()) {
-                    if (liveEdgeCheckInterval) clearInterval(liveEdgeCheckInterval);
-                    liveEdgeCheckInterval = setInterval(() => {
-                        if (!shakaInstance || !shakaInstance.isLive()) return;
-                        try {
-                            const seekRange = shakaInstance.seekRange();
-                            const currentPos = videoPlayer.currentTime;
-                            const liveEdge = seekRange.end;
-                            const drift = liveEdge - currentPos;
-                            if (drift > 15 && !videoPlayer.paused) {
-                                console.warn(`[Audio Fix][Shaka] Drift ${drift.toFixed(1)}s, seeking to live edge...`);
-                                videoPlayer.currentTime = liveEdge - 2;
-                            }
-                        } catch (e) { /* Shaka may be destroyed */ }
-                    }, 30000);
-                }
-
-            }
-            // --- Case 2: HLS / M3U8 (Using Hls.js) ---
-            else if (typeof Hls !== 'undefined' && Hls.isSupported() && !isMPD) {
-                hlsInstance = new Hls({
-                    enableWorker: false,             // Tắt worker trên Windows để tránh lệch clock âm thanh
-                    lowLatencyMode: false,
-                    backBufferLength: 10,
-                    maxBufferLength: 30,
-                    maxMaxBufferLength: 60,
-                    maxBufferSize: 60 * 1000 * 1000,
-                    manifestLoadingMaxRetry: 10,
-                    manifestLoadingRetryDelay: 1000,
-                    manifestLoadingMaxRetryTimeout: 64000,
-                    levelLoadingMaxRetry: 10,
-                    fragLoadingMaxRetry: 10,
-                    fragLoadingRetryDelay: 1000,
-                    startLevel: -1,
-                    // === ABR Tuning ===
-                    abrEwmaFastLive: 3,
-                    abrEwmaSlowLive: 9,
-                    abrEwmaFastVoD: 3,
-                    abrEwmaSlowVoD: 9,
-                    abrBandWidthFactor: 0.7,
-                    abrBandWidthUpFactor: 0.5,
-                    abrMaxWithRealBitrate: true,
-                    abrEwmaDefaultEstimate: 500000,
-                    abrEwmaDefaultEstimateMax: 5000000,
-                    // === Discontinuity / Anti-distortion ===
-                    liveSyncDurationCount: 3,
-                    liveMaxLatencyDurationCount: 6,
-                    stretchShortVideoTrack: true,
-                    maxBufferHole: 2.0,              // Tăng lên 2s để tránh khựng khi nối đoạn quảng cáo (như khi có quảng cáo)
-                    highBufferWatchdogPeriod: 2,
-                    forceKeyFrameOnDiscontinuity: true,
-                    progressive: false,
-                    // === Audio Sync Tuning ===
-                    maxAudioFramesDrift: 1,          // Ép đồng bộ âm thanh cực gắt
-                    initialLiveManifestSize: 3,
-                });
-
-                hlsInstance.loadSource(resolvedUrl);
-                hlsInstance.attachMedia(videoPlayer);
-
-                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-                    videoPlayer.play().catch(e => {
-                        showToast('Nhấn nút Play để chạy luồng.', 'warning');
-                        loadingOverlay.classList.add('hidden');
-                    });
-
-                    // === Kiểm tra Audio-Only từ HLS manifest (chính xác nhất) ===
-                    if (hlsInstance.levels && hlsInstance.levels.length > 0) {
-                        const allAudioOnly = hlsInstance.levels.every(l => !l.videoCodec || l.videoCodec === '');
-                        if (allAudioOnly) {
-                            showAudioVisualizer(channel);
-                        }
-                    }
-
-                    // Populate quality selector from HLS levels
-                    const qualitySelector = document.getElementById('quality-selector');
-                    if (hlsInstance.levels && hlsInstance.levels.length > 1) {
-                        const currentLvl = hlsInstance.levels[hlsInstance.currentLevel] || hlsInstance.levels[0];
-                        const initH = currentLvl ? currentLvl.height : 0;
-                        qualitySelector.innerHTML = `<option value="-1">Auto${initH ? ' (' + initH + 'p)' : ''}</option>`;
-                        hlsInstance.levels.forEach((level, i) => {
-                            const opt = document.createElement('option');
-                            opt.value = i;
-                            opt.textContent = level.height ? `${level.height}p` : `Chất lượng ${i + 1}`;
-                            qualitySelector.appendChild(opt);
-                        });
-                        qualitySelector.classList.remove('hidden');
-                    } else {
-                        const h = hlsInstance.levels && hlsInstance.levels.length === 1 ? hlsInstance.levels[0].height : 0;
-                        qualitySelector.innerHTML = `<option value="0" id="single-quality-opt">${h ? h + 'p' : 'Đang tải...'}</option>`;
-                        qualitySelector.classList.remove('hidden');
-
-                        videoPlayer.addEventListener('resize', function updateRes() {
-                            const realHeight = videoPlayer.videoHeight;
-                            const opt = document.getElementById('single-quality-opt');
-                            if (realHeight && opt && opt.textContent === 'Đang tải...') {
-                                opt.textContent = `${realHeight}p`;
-                                videoPlayer.removeEventListener('resize', updateRes);
-                            }
-                        });
-                    }
-                });
-
-                // === Cập nhật dropdown khi ABR tự chuyển level ===
-                hlsInstance.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
-                    const qualitySelector = document.getElementById('quality-selector');
-                    if (!qualitySelector) return;
-                    if (hlsInstance.autoLevelEnabled && qualitySelector.value === '-1') {
-                        const level = hlsInstance.levels[data.level];
-                        const h = level ? level.height : 0;
-                        const autoOpt = qualitySelector.querySelector('option[value="-1"]');
-                        if (autoOpt) {
-                            autoOpt.textContent = h ? `Auto (${h}p)` : 'Auto';
-                        }
-                    }
-                });
-
-
-
-                // === Live Edge Auto-Recovery (Anti audio drift) ===
-                // Chỉ setup 1 lần khi phát hiện live stream
-                let liveEdgeSetup = false;
-                hlsInstance.on(Hls.Events.LEVEL_LOADED, (event, data) => {
-                    if (data.details && data.details.live && !liveEdgeSetup) {
-                        liveEdgeSetup = true;
-                        if (liveEdgeCheckInterval) clearInterval(liveEdgeCheckInterval);
-                        liveEdgeCheckInterval = setInterval(() => {
-                            if (!hlsInstance || !hlsInstance.liveSyncPosition) return;
-                            const liveEdge = hlsInstance.liveSyncPosition;
-                            const currentPos = videoPlayer.currentTime;
-                            const drift = liveEdge - currentPos;
-
-                            // Nếu trễ hơn 15 giây so với live edge → seek nhẹ nhàng
-                            if (drift > 15 && !videoPlayer.paused) {
-                                console.warn(`[Audio Fix] Drift ${drift.toFixed(1)}s, seeking to live edge...`);
-                                videoPlayer.currentTime = liveEdge - 2; // Về cách live edge 2s
-                            }
-                        }, 30000);
-                    }
-                });
-
-                // === Xử lý khi qua discontinuity (quảng cáo/chuyển bài) ===
-                hlsInstance.on(Hls.Events.FRAG_CHANGED, (event, data) => {
-                    if (data.frag && data.frag.tagList && data.frag.tagList.includes('DISCONTINUITY')) {
-                        console.warn('[Audio-Fix] Discontinuity detected, letting Hls.js sync...');
-                    }
-                });
-                let hlsErrorRecoveries = 0;
-                let hlsNetworkRecoveries = 0;
-
-                hlsInstance.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                console.warn('HLS network error, retrying...', data.details);
-                                if (hlsNetworkRecoveries < 5) {
-                                    hlsNetworkRecoveries++;
-                                    hlsInstance.startLoad();
-                                } else if (hlsErrorRecoveries < 2) {
-                                    hlsErrorRecoveries++;
-                                    hlsNetworkRecoveries = 0;
-                                    hlsInstance.startLoad();
-                                } else {
-                                    showToast('Lỗi mạng kéo dài, đang tải lại luồng...', 'warning');
-                                    setTimeout(() => { if (currentPlayingUrl === url) playChannel(channel); }, 5000);
-                                }
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.warn('HLS media error, recovering...', data.details);
-                                if (hlsErrorRecoveries < 3) {
-                                    hlsErrorRecoveries++;
-                                    hlsInstance.recoverMediaError();
-                                } else if (hlsErrorRecoveries === 3) {
-                                    hlsErrorRecoveries++;
-                                    hlsInstance.swapAudioCodec();
-                                    hlsInstance.recoverMediaError();
-                                } else {
-                                    showToast('Lỗi dữ liệu luồng không thể phục hồi, đang tải lại...', 'error');
-                                    setTimeout(() => { if (currentPlayingUrl === url) playChannel(channel); }, 5000);
-                                }
-                                break;
-                            default:
-                                console.error('HLS Fatal Error:', data);
-                                hlsInstance.destroy();
-                                setTimeout(() => {
-                                    if (currentPlayingUrl === url) playChannel(channel);
-                                }, 5000);
-                                break;
-                        }
-                    }
-                });
-
-            }
-            // --- Case 3: Raw MPEG-TS / FLV stream (Using mpegts.js) ---
-            else if (typeof mpegts !== 'undefined' && mpegts.isSupported() && (isRawTS || isFLV)) {
-                mpegtsInstance = mpegts.createPlayer({
-                    type: isFLV ? 'flv' : 'mpegts',
-                    isLive: true,
-                    url: resolvedUrl
-                }, {
-                    enableWorker: true,
-                    liveBufferLatencyChasing: false,
-                    liveBufferLatencyMaxLatency: 5,
-                    liveBufferLatencyMinRemain: 1.0,
-                    autoCleanupSourceBuffer: true,       // Tự động dọn buffer cũ
-                    autoCleanupMaxBackwardDuration: 30,   // Chỉ giữ 30s buffer phía sau
-                    autoCleanupMinBackwardDuration: 15,   // Bắt đầu dọn khi >15s
-                    fixAudioTimestampGap: true,           // Sửa audio gap tự động
-                });
-
-                mpegtsInstance.attachMediaElement(videoPlayer);
-                mpegtsInstance.load();
-                mpegtsInstance.play().catch(e => {
-                    showToast('Nhấn nút Play để chạy luồng TS.', 'warning');
-                    loadingOverlay.classList.add('hidden');
-                });
-
-                let mpegtsRetries = 0;
-                mpegtsInstance.on(mpegts.Events.ERROR, (errorType, errorDetail, errorInfo) => {
-                    console.error('mpegts.js Error:', errorType, errorDetail, errorInfo);
-                    if (errorType === mpegts.ErrorTypes.NETWORK_ERROR) {
-                        if (mpegtsRetries < 3) {
-                            mpegtsRetries++;
-                            console.log(`Mpegts network error, retry ${mpegtsRetries}...`);
-                            // Mpegts.js handles some retries internally if configured,
-                            // but here we manually reload after a delay if it stays dead
-                        } else {
-                            showToast('Lỗi mạng luồng TS/FLV. Đang thử lại...', 'error');
-                            setTimeout(() => {
-                                if (currentPlayingUrl === url) playChannel(channel);
-                            }, 5000);
-                        }
-                    }
-                });
-
-                document.getElementById('quality-selector').classList.add('hidden');
-            }
-            // --- Case 4: Fallback (Native browser playback) ---
-            else {
-                videoPlayer.src = resolvedUrl;
-                videoPlayer.play().catch(e => {
-                    loadingOverlay.classList.add('hidden');
-                    showToast('Đang chờ trình duyệt tải video...', 'info');
-                });
+                if (drmStatus) drmStatus.classList.add('hidden');
+            } else {
+                showToast('⚠️ Trình duyệt không hỗ trợ DRM.', 'warning');
             }
 
             videoPlayer.onplaying = () => {
                 loadingOverlay.classList.add('hidden');
-
-                // Kiểm tra nguồn audio đã biết qua domain/đuôi file (cho native/fallback player)
-                const isKnownAudioSource = currentPlayingUrl.includes('zmp3.zmdcdn.me') ||
-                    currentPlayingUrl.includes('mp3.zing.vn') ||
-                    /\.(mp3|aac|ogg|flac|opus)(\?|$)/i.test(currentPlayingUrl);
-                if (isKnownAudioSource) {
-                    showAudioVisualizer(channel);
-                }
-
-
+                showToast('✅ Đang phát: ' + config.name, 'success');
             };
 
             videoPlayer.onwaiting = () => {
                 loadingOverlay.classList.remove('hidden');
             };
+        }
 
-            videoPlayer.onerror = () => {
-                const nativeError = videoPlayer.error;
-                // Chỉ tự động reload nếu không dùng Hls.js/Shaka/Mpegts (hoặc khi fallback lỗi native thực sự)
-                // Hạn chế reload liên tục nếu lỗi MEDIA_ERR_SRC_NOT_SUPPORTED
-                if (!hlsInstance && !shakaInstance && !mpegtsInstance) {
-                    showToast('Lỗi phát luồng trình duyệt. Đang thử lại...', 'error');
-                    setTimeout(() => {
-                        if (currentPlayingUrl === url) playChannel(channel);
-                    }, 4000);
-                }
+        async function playChannel(channel) {
+            currentPlayingUrl = channel.url;
+            currentDRMConfig = null;
+
+            playerOverlay.style.opacity = '0';
+            loadingOverlay.classList.remove('hidden');
+            filterChannels();
+
+            if (shakaInstance) await shakaInstance.destroy();
+            if (hlsInstance) hlsInstance.destroy();
+
+            videoPlayer.pause();
+            videoPlayer.removeAttribute('src');
+            videoPlayer.load();
+
+            // === HLS.js ===
+            if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+                hlsInstance = new Hls({
+                    enableWorker: false,
+                    backBufferLength: 10,
+                    maxBufferLength: 30
+                });
+
+                hlsInstance.loadSource(channel.url);
+                hlsInstance.attachMedia(videoPlayer);
+
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+                    videoPlayer.play();
+
+                    const qualitySelector = document.getElementById('quality-selector');
+                    if (hlsInstance.levels && hlsInstance.levels.length > 1) {
+                        qualitySelector.innerHTML = '<option value="-1">Auto</option>';
+                        hlsInstance.levels.forEach((level, i) => {
+                            const opt = document.createElement('option');
+                            opt.value = i;
+                            opt.textContent = level.height ? `${level.height}p` : `Quality ${i + 1}`;
+                            qualitySelector.appendChild(opt);
+                        });
+                        qualitySelector.classList.remove('hidden');
+                    }
+                });
+            } else {
+                videoPlayer.src = channel.url;
+                videoPlayer.play();
+            }
+
+            videoPlayer.onplaying = () => {
+                loadingOverlay.classList.add('hidden');
+            };
+
+            videoPlayer.onwaiting = () => {
+                loadingOverlay.classList.remove('hidden');
             };
         }
 
-        // === Quality Selector Logic ===
         document.getElementById('quality-selector').addEventListener('change', (e) => {
             const val = e.target.value;
-            const label = e.target.options[e.target.selectedIndex].text;
-
             if (hlsInstance) {
-                hlsInstance.currentLevel = val === 'auto' || val === '-1' ? -1 : parseInt(val);
+                hlsInstance.currentLevel = val === '-1' ? -1 : parseInt(val);
             } else if (shakaInstance) {
                 if (val === 'auto') {
-                    // Bật lại ABR tự động
                     shakaInstance.configure({ abr: { enabled: true } });
                 } else {
-                    // Tắt ABR, chọn track theo height
                     shakaInstance.configure({ abr: { enabled: false } });
-                    const targetHeight = parseInt(val);
                     const tracks = shakaInstance.getVariantTracks();
-                    const match = tracks.find(t => t.height === targetHeight);
+                    const match = tracks.find(t => t.height === parseInt(val));
                     if (match) shakaInstance.selectVariantTrack(match, true);
                 }
             }
-            showToast(`Chất lượng: ${label}`, 'success');
         });
 
-        // === Keyboard Shortcuts ===
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-            // Native shortcut for PiP is usually not standard, but we'll remove our custom 'P' map to avoid confusion
-        });
-
-        // Chỉ tải EPG mặc định, không tự động tải danh sách kênh
         window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => fetchEPG(), 100);
+            renderCategoryTabs();
+            filterChannels();
         });
     </script>
 </body>
