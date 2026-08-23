@@ -781,8 +781,10 @@
 
             // === PHƯƠNG ÁN 3: CORS Proxy (cho HTTPS deployment) ===
             const CORS_PROXIES = [
+                ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
                 'https://api.allorigins.win/raw?url=',
                 'https://corsproxy.io/?url=',
+                'https://api.codetabs.com/v1/proxy?quest=',
             ];
             for (const proxy of CORS_PROXIES) {
                 try {
@@ -975,9 +977,19 @@
          * nên với các kênh cần header riêng, ta định tuyến qua proxy.php —
          * PHP sẽ dùng cURL gọi origin kèm đúng header, trình duyệt chỉ nói chuyện với proxy.
          */
+        // Ghép PROXY_BASE_URL thành tiền tố URL đúng cách, hỗ trợ cả 2 dạng:
+        // - File cụ thể: "./proxy.php"                 -> "./proxy.php?url="
+        // - Domain gốc Worker: "https://xxx.workers.dev" -> "https://xxx.workers.dev/?url="
+        function proxyQueryPrefix() {
+            if (!PROXY_BASE_URL) return '';
+            return /\.php(\?.*)?$/i.test(PROXY_BASE_URL)
+                ? PROXY_BASE_URL + '?url='
+                : PROXY_BASE_URL.replace(/\/$/, '') + '/?url=';
+        }
+
         function buildProxyUrl(targetUrl, userAgent, referer) {
             if (!PROXY_BASE_URL) return targetUrl; // Chưa cấu hình Worker -> phát trực tiếp (có thể lỗi UA/Referer)
-            let proxied = PROXY_BASE_URL.replace(/\/$/, '') + '/?url=' + encodeURIComponent(targetUrl);
+            let proxied = proxyQueryPrefix() + encodeURIComponent(targetUrl);
             if (userAgent) proxied += '&ua=' + encodeURIComponent(userAgent);
             if (referer) proxied += '&ref=' + encodeURIComponent(referer);
             return proxied;
@@ -1561,12 +1573,15 @@
             let text = '';
 
             // Danh sách các proxy để thử nghiệm vượt rào CORS
+            // Ưu tiên dùng Worker riêng của bạn trước (ổn định, do bạn kiểm soát),
+            // sau đó mới thử trực tiếp và các proxy công cộng (có thể quá tải/bị chặn theo thời gian).
             const isLocal = !urlInput.startsWith('http');
             const proxies = isLocal ? [''] : [
-                '', // 1: Thử trực tiếp đầu tiên (Phù hợp Github)
+                ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []), // 0: Worker riêng (nếu đã cấu hình)
+                '', // 1: Thử trực tiếp
                 'https://api.allorigins.win/raw?url=', // 2: Proxy Allorigins phổ biến
                 'https://corsproxy.io/?url=', // 3: Corsproxy IO
-                'https://crossorigin.me/', // 4: Crossorigin fallback
+                'https://api.codetabs.com/v1/proxy?quest=', // 4: Codetabs proxy fallback
             ];
 
             let success = false;
@@ -2301,8 +2316,10 @@
                         console.warn('[Resolver] ❌ XHR/Fetch thất bại, thử CORS proxy...');
                         // === PHƯƠNG ÁN 3: CORS Proxy (cho HTTPS deployment) ===
                         const CORS_PROXIES = [
+                            ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
                             'https://api.allorigins.win/raw?url=',
                             'https://corsproxy.io/?url=',
+                            'https://api.codetabs.com/v1/proxy?quest=',
                         ];
                         for (const proxy of CORS_PROXIES) {
                             try {
@@ -2402,6 +2419,9 @@
                 return;
             }
 
+            // Lưu URL gốc (trước khi bị bọc qua proxy) — cần dùng để hỏi license server ClearKey động
+            const originalStreamUrl = resolvedUrl;
+
             // Kênh cần User-Agent/Referer riêng -> định tuyến qua Cloudflare Worker proxy
             // (trình duyệt chặn JS ghi đè header này, nên phải nhờ server gọi hộ)
             const channelHeaders = getChannelHeaders(channel);
@@ -2449,37 +2469,73 @@
                         } catch(e) { /* ignore */ }
                     }
 
-                    // TH1: license_key là URL (license server trả về key động)
+                    // TH1: license_key là URL (license server trả về key động — kiểu "AutoKey")
+                    // Nhiều server loại này dùng CHUNG 1 URL cho mọi kênh, và cần biết đang xin
+                    // key cho stream nào -> thử lần lượt vài kiểu ghép tham số phổ biến.
                     if (Object.keys(clearKeys).length === 0 && keyString && (keyString.startsWith('http://') || keyString.startsWith('https://'))) {
-                        try {
-                            const userAgent = (channel.props && channel.props['http-user-agent']) || 'Dalvik/2.1.0';
-                            const keyResp = await fetch(keyString, {
-                                headers: { 'User-Agent': userAgent, 'Accept': '*/*' }
-                            });
-                            if (keyResp.ok) {
-                                const keyText = await keyResp.text();
+                        const userAgent = (channel.props && (channel.props['http-user-agent'] || channel.props['User-Agent'])) || 'Dalvik/2.1.0';
+                        const baseKeyUrl = keyString.endsWith('/') ? keyString : keyString + '/';
+
+                        // Các dạng URL license server hay gặp, thử tuần tự tới khi ra key hợp lệ
+                        const candidateUrls = [
+                            keyString, // Dùng nguyên văn (trường hợp URL đã đầy đủ tham số)
+                            baseKeyUrl + encodeURIComponent(originalStreamUrl), // .../AutoKey/<mpd đã encode>
+                            baseKeyUrl + originalStreamUrl, // .../AutoKey/<mpd nguyên văn>
+                            keyString + (keyString.includes('?') ? '&' : '?') + 'url=' + encodeURIComponent(originalStreamUrl), // ...?url=<mpd>
+                        ];
+
+                        // Thử fetch trực tiếp, nếu bị chặn CORS thì thử qua các proxy dự phòng
+                        const licenseProxies = [
+                            '', // trực tiếp
+                            ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
+                            'https://api.allorigins.win/raw?url=',
+                            'https://corsproxy.io/?url=',
+                            'https://api.codetabs.com/v1/proxy?quest=',
+                        ];
+
+                        outer:
+                        for (const candidate of candidateUrls) {
+                            for (const proxy of licenseProxies) {
                                 try {
-                                    const keyData = JSON.parse(keyText);
-                                    if (keyData.keys && Array.isArray(keyData.keys)) {
-                                        keyData.keys.forEach(k => {
-                                            clearKeys[base64ToHex(k.kid)] = base64ToHex(k.k);
-                                        });
-                                    } else if (keyData.kid && keyData.k) {
-                                        clearKeys[base64ToHex(keyData.kid)] = base64ToHex(keyData.k);
-                                    }
-                                } catch(e) {
-                                    const trimmed = keyText.trim();
-                                    if (trimmed.includes(':')) {
-                                        const parts = trimmed.split(':');
-                                        if (parts.length === 2 && /^[0-9a-fA-F]+$/.test(parts[0]) && /^[0-9a-fA-F]+$/.test(parts[1])) {
-                                            clearKeys[parts[0].toLowerCase()] = parts[1].toLowerCase();
+                                    const fetchUrl = proxy ? proxy + encodeURIComponent(candidate) : candidate;
+                                    const keyResp = await fetch(fetchUrl, {
+                                        headers: proxy ? {} : { 'User-Agent': userAgent, 'Accept': '*/*' }
+                                    });
+                                    if (!keyResp.ok) continue;
+                                    const keyText = await keyResp.text();
+                                    if (!keyText || keyText.length < 5) continue;
+
+                                    try {
+                                        const keyData = JSON.parse(keyText);
+                                        if (keyData.keys && Array.isArray(keyData.keys)) {
+                                            keyData.keys.forEach(k => {
+                                                if (k.kid && k.k) clearKeys[base64ToHex(k.kid)] = base64ToHex(k.k);
+                                            });
+                                        } else if (keyData.kid && keyData.k) {
+                                            clearKeys[base64ToHex(keyData.kid)] = base64ToHex(keyData.k);
+                                        }
+                                    } catch(e) {
+                                        const trimmed = keyText.trim();
+                                        if (trimmed.includes(':')) {
+                                            const parts = trimmed.split(':');
+                                            if (parts.length === 2 && /^[0-9a-fA-F]{16,64}$/.test(parts[0]) && /^[0-9a-fA-F]{16,64}$/.test(parts[1])) {
+                                                clearKeys[parts[0].toLowerCase()] = parts[1].toLowerCase();
+                                            }
                                         }
                                     }
+
+                                    if (Object.keys(clearKeys).length > 0) {
+                                        console.log(`[ClearKey] ✅ Lấy key thành công từ: ${fetchUrl}`, clearKeys);
+                                        break outer;
+                                    }
+                                } catch(e) {
+                                    // Thử phương án tiếp theo
                                 }
-                                console.log(`Fetched ClearKey from license URL:`, clearKeys);
                             }
-                        } catch(e) {
-                            console.warn(`Không thể fetch license key từ URL ${keyString}:`, e.message);
+                        }
+
+                        if (Object.keys(clearKeys).length === 0) {
+                            console.warn(`[ClearKey] Không lấy được key động từ ${keyString} (đã thử ${candidateUrls.length} kiểu URL x ${licenseProxies.length} proxy).`);
                         }
                     }
 
