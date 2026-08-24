@@ -2431,11 +2431,13 @@
 
             // Kênh cần User-Agent/Referer riêng -> định tuyến qua Cloudflare Worker proxy
             // (trình duyệt chặn JS ghi đè header này, nên phải nhờ server gọi hộ)
+            // LƯU Ý: bỏ qua bước này cho MPD/DASH — phát thẳng trực tiếp, không qua proxy
+            // (proxy hoá manifest DASH dễ gây lỗi tải segment/license hơn là giúp ích).
             const channelHeaders = getChannelHeaders(channel);
-            if (PROXY_BASE_URL && (channelHeaders.userAgent || channelHeaders.referer) && /^https?:\/\//i.test(resolvedUrl)) {
+            if (PROXY_BASE_URL && !isMPD && (channelHeaders.userAgent || channelHeaders.referer) && /^https?:\/\//i.test(resolvedUrl)) {
                 console.log('[Headers] Áp dụng UA/Referer riêng qua proxy:', channelHeaders);
                 resolvedUrl = buildProxyUrl(resolvedUrl, channelHeaders.userAgent, channelHeaders.referer);
-            } else if (!PROXY_BASE_URL && (channelHeaders.userAgent || channelHeaders.referer)) {
+            } else if (!PROXY_BASE_URL && !isMPD && (channelHeaders.userAgent || channelHeaders.referer)) {
                 console.warn('[Headers] Kênh cần UA/Referer riêng nhưng PROXY_BASE_URL chưa cấu hình — có thể phát lỗi.');
             }
 
