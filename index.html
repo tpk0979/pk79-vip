@@ -1036,7 +1036,7 @@
         // ví dụ: "https://ten-worker-cua-ban.username.workers.dev"
         // Để trống ("") thì tính năng UA/Referer riêng sẽ bị tắt.
         // ============================================================
-        const PROXY_BASE_URL = ""; // Đã tắt proxy — mọi kênh phát thẳng trực tiếp, không qua Worker
+        const PROXY_BASE_URL = "https://pk79-proxy.tongphuockhai9.workers.dev"; // Chỉ dùng cho kênh http:// hoặc cần UA/Referer riêng — kênh https:// thường vẫn phát thẳng
 
         let allChannels = [];
         let hlsInstance = null;
@@ -2431,13 +2431,30 @@
 
             // Kênh cần User-Agent/Referer riêng -> định tuyến qua Cloudflare Worker proxy
             // (trình duyệt chặn JS ghi đè header này, nên phải nhờ server gọi hộ)
-            // LƯU Ý: bỏ qua bước này cho MPD/DASH — phát thẳng trực tiếp, không qua proxy
+            // Kênh dùng link http:// (không có "s") trong khi trang web chạy https:// -> BẮT BUỘC
+            // phải qua proxy, vì trình duyệt luôn chặn cứng "Mixed Content" (http trong trang https),
+            // không có cách nào né bằng code phía trình duyệt.
+            // LƯU Ý: bỏ qua bước này cho MPD/DASH (link https bình thường) — phát thẳng trực tiếp
             // (proxy hoá manifest DASH dễ gây lỗi tải segment/license hơn là giúp ích).
             const channelHeaders = getChannelHeaders(channel);
-            if (PROXY_BASE_URL && !isMPD && (channelHeaders.userAgent || channelHeaders.referer) && /^https?:\/\//i.test(resolvedUrl)) {
-                console.log('[Headers] Áp dụng UA/Referer riêng qua proxy:', channelHeaders);
+            const isPageHttps = location.protocol === 'https:';
+            const isSourceHttp = /^http:\/\//i.test(resolvedUrl);
+            const needsProxyForMixedContent = isPageHttps && isSourceHttp;
+            const needsProxyForHeaders = !isMPD && (channelHeaders.userAgent || channelHeaders.referer);
+
+            if (PROXY_BASE_URL && (needsProxyForMixedContent || needsProxyForHeaders) && /^https?:\/\//i.test(resolvedUrl)) {
+                console.log(
+                    needsProxyForMixedContent
+                        ? '[Mixed Content] Kênh dùng link http:// trên trang https:// -> bắt buộc qua proxy:'
+                        : '[Headers] Áp dụng UA/Referer riêng qua proxy:',
+                    channelHeaders
+                );
                 resolvedUrl = buildProxyUrl(resolvedUrl, channelHeaders.userAgent, channelHeaders.referer);
-            } else if (!PROXY_BASE_URL && !isMPD && (channelHeaders.userAgent || channelHeaders.referer)) {
+            } else if (!PROXY_BASE_URL && needsProxyForMixedContent) {
+                loadingOverlay.classList.add('hidden');
+                showToast('Kênh này dùng link http:// (không mã hoá) — trình duyệt luôn chặn khi trang web chạy https://. Cần cấu hình PROXY_BASE_URL (Cloudflare Worker) mới phát được.', 'error');
+                return;
+            } else if (!PROXY_BASE_URL && needsProxyForHeaders) {
                 console.warn('[Headers] Kênh cần UA/Referer riêng nhưng PROXY_BASE_URL chưa cấu hình — có thể phát lỗi.');
             }
 
