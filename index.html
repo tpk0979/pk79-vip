@@ -17,6 +17,8 @@
     
     <!-- Bổ sung WebTorrent để đọc link Magnet/P2P -->
     <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
+    <!-- Bổ sung YouTube Iframe API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -139,9 +141,9 @@
 
         .video-container { border-radius: 0 !important; }
         .video-container:fullscreen { width: 100vw; height: 100vh; background: #000; }
-        .video-container:fullscreen #video-player, .video-container:fullscreen #iframe-player { width: 100%; height: 100%; object-fit: contain; }
+        .video-container:fullscreen #video-player, .video-container:fullscreen #iframe-player, .video-container:fullscreen #yt-player { width: 100%; height: 100%; object-fit: contain; }
         .video-container:-webkit-full-screen { width: 100vw; height: 100vh; background: #000; }
-        .video-container:-webkit-full-screen #video-player, .video-container:-webkit-full-screen #iframe-player { width: 100%; height: 100%; object-fit: contain; }
+        .video-container:-webkit-full-screen #video-player, .video-container:-webkit-full-screen #iframe-player, .video-container:-webkit-full-screen #yt-player { width: 100%; height: 100%; object-fit: contain; }
 
         .category-tab { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; }
         .category-tab.active { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
@@ -263,8 +265,11 @@
                     <!-- NATIVE VIDEO PLAYER -->
                     <video id="video-player" class="w-full h-full object-contain" playsinline controls></video>
                     
-                    <!-- BỔ SUNG IFRAME PLAYER (Cho Youtube, Twitch, Bóng đá web...) -->
+                    <!-- BỔ SUNG IFRAME PLAYER (Cho Twitch, Bóng đá web...) -->
                     <iframe id="iframe-player" class="w-full h-full border-none hidden absolute inset-0 z-10" allowfullscreen allow="autoplay; fullscreen"></iframe>
+                    
+                    <!-- YOUTUBE API PLAYER (Chuyên xử lý Youtube Auto-Next) -->
+                    <div id="yt-player" class="w-full h-full border-none hidden absolute inset-0 z-10 pointer-events-auto"></div>
 
                     <!-- Player Overlay (Intro) -->
                     <div id="player-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black transition-opacity duration-700 pointer-events-none">
@@ -430,6 +435,7 @@
         let shakaInstance = null;
         let mpegtsInstance = null;
         let webtorrentClient = null; // Quản lý WebTorrent
+        let ytPlayer = null; // Quản lý YouTube API
         let currentPlayingUrl = null;
         let selectedChannelId = null;
 
@@ -456,6 +462,31 @@
         const playerOverlay = document.getElementById('player-overlay');
         const loadingOverlay = document.getElementById('loading-overlay');
         const videoContainer = document.querySelector('.video-container');
+
+        // Hàm tiện ích bóc tách ID YouTube
+        function getYoutubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Logic tự động chuyển bài
+        function playNextChannel() {
+            if (!allChannels || allChannels.length === 0) return;
+            const currentIndex = allChannels.findIndex(c => c.url === currentPlayingUrl);
+            if (currentIndex !== -1 && currentIndex < allChannels.length - 1) {
+                const nextChannel = allChannels[currentIndex + 1];
+                showToast(`Tự động chuyển bài: ${nextChannel.name}`, 'info');
+                playChannel(nextChannel);
+            } else {
+                showToast('Đã hết danh sách phát.', 'info');
+                stopChannel();
+            }
+        }
+        
+        // Gắn sự kiện chuyển bài cho trình phát gốc
+        videoPlayer.addEventListener('ended', playNextChannel);
 
         videoPlayer.addEventListener('resize', () => {
             const audioVis = document.getElementById('audio-visualizer');
@@ -754,11 +785,11 @@
 
         function isDirectStreamUrl(url) {
             if (!url) return false;
-            // Bao gồm tất cả: m3u8, mpd, mp4, udp, magnet
             return /\.(m3u8|mpd|ts|mp4|flv|aac|mp3|m4a|ogg|webm|mov|mkv|flac|opus)(\?|#|$)/i.test(url) ||
                    url.includes('Manifest') || url.includes('playlist.m3u') ||
                    url.includes('/play/') || url.includes(':2086/') || url.includes(':2087/') ||
-                   url.startsWith('udp://') || url.startsWith('magnet:') || url.endsWith('.torrent');
+                   url.startsWith('udp://') || url.startsWith('magnet:') || url.endsWith('.torrent') ||
+                   getYoutubeId(url) !== null || url.includes('twitch.tv/') || url.includes('iframe=true');
         }
 
         // ============================================================
@@ -1018,7 +1049,9 @@
             const isRtmpRtsp = /^rtmps?:\/\//i.test(urlInput) || /^rtsp:\/\//i.test(urlInput);
             const isUdp = /^udp:\/\//i.test(urlInput);
             const isMagnet = urlInput.startsWith('magnet:') || urlInput.endsWith('.torrent');
-            const isEmbed = urlInput.includes('youtube.com/') || urlInput.includes('twitch.tv/') || urlInput.includes('iframe=true');
+            
+            const ytId = getYoutubeId(urlInput);
+            const isEmbed = (ytId !== null) || urlInput.includes('twitch.tv/') || urlInput.includes('iframe=true');
 
             if (isRtmpRtsp) {
                 closeAddDialog();
@@ -1033,7 +1066,7 @@
                 try {
                     if (isUdp) streamName = "Luồng IPTV FPT (UDP)";
                     else if (isMagnet) streamName = "Phim Torrent/P2P";
-                    else if (isEmbed) streamName = "Trình phát nhúng (Iframe)";
+                    else if (isEmbed) streamName = "Trình phát nhúng (Iframe/Youtube)";
                     else {
                         const pathParts = new URL(urlInput).pathname.split('/');
                         streamName = decodeURIComponent(pathParts.filter(p => p).pop() || 'Luồng trực tiếp');
@@ -1149,6 +1182,10 @@
             
             videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
             if (iframePlayer) { iframePlayer.classList.add('hidden'); iframePlayer.src = ''; }
+            
+            if (ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
+            const ytPlayerEl = document.getElementById('yt-player');
+            if (ytPlayerEl) ytPlayerEl.classList.add('hidden');
 
             if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
             playerOverlay.style.opacity = '1';
@@ -1181,6 +1218,11 @@
             
             videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
             if (iframePlayer) { iframePlayer.classList.add('hidden'); iframePlayer.src = ''; }
+            
+            if (ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
+            const ytPlayerEl = document.getElementById('yt-player');
+            if (ytPlayerEl) ytPlayerEl.classList.add('hidden');
+            
             videoPlayer.classList.remove('hidden');
 
             if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
@@ -1403,6 +1445,8 @@
 
             filterChannels();
 
+            const ytPlayerEl = document.getElementById('yt-player');
+
             // CLEANUP ALL PLAYERS
             if (liveEdgeCheckInterval) { clearInterval(liveEdgeCheckInterval); liveEdgeCheckInterval = null; }
             if (bufferCleanupInterval) { clearInterval(bufferCleanupInterval); bufferCleanupInterval = null; }
@@ -1413,10 +1457,10 @@
             
             videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
             
-            if (iframePlayer) {
-                iframePlayer.classList.add('hidden');
-                iframePlayer.src = '';
-            }
+            if (iframePlayer) { iframePlayer.classList.add('hidden'); iframePlayer.src = ''; }
+            if (ytPlayerEl) { ytPlayerEl.classList.add('hidden'); }
+            if (ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
+
             videoPlayer.classList.remove('hidden');
 
             let resolvedUrl = url;
@@ -1436,26 +1480,40 @@
             }
 
             // ==============================================
-            // 2. XỬ LÝ NHÚNG IFRAME (Youtube, Twitch, Web bóng đá)
+            // 2. XỬ LÝ NHÚNG IFRAME & YOUTUBE API
             // ==============================================
-            const isEmbed = resolvedUrl.includes('youtube.com/embed') || 
-                            resolvedUrl.includes('youtube.com/watch') ||
-                            resolvedUrl.includes('twitch.tv') ||
-                            resolvedUrl.includes('iframe=true') ||
-                            resolvedUrl.match(/\.(php|html)$/i) && !resolvedUrl.includes('proxy');
+            const ytId = getYoutubeId(resolvedUrl);
+            const isEmbed = (ytId !== null) || 
+                            resolvedUrl.includes('twitch.tv') || 
+                            resolvedUrl.includes('iframe=true') || 
+                            (resolvedUrl.match(/\.(php|html)$/i) && !resolvedUrl.includes('proxy'));
 
             if (isEmbed) {
                 loadingOverlay.classList.add('hidden');
                 videoPlayer.classList.add('hidden');
-                iframePlayer.classList.remove('hidden');
                 
-                if (resolvedUrl.includes('youtube.com/watch?v=')) {
-                    try {
-                        const videoId = new URL(resolvedUrl).searchParams.get('v');
-                        resolvedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-                    } catch(e) {}
+                if (ytId) {
+                    ytPlayerEl.classList.remove('hidden');
+                    if (ytPlayer) {
+                        ytPlayer.loadVideoById(ytId);
+                    } else {
+                        ytPlayer = new YT.Player('yt-player', {
+                            host: 'https://www.youtube-nocookie.com',
+                            videoId: ytId,
+                            playerVars: {
+                                'autoplay': 1, 'rel': 0, 'modestbranding': 1, 'iv_load_policy': 3, 'enablejsapi': 1
+                            },
+                            events: {
+                                'onStateChange': function(event) {
+                                    if (event.data === YT.PlayerState.ENDED) playNextChannel();
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    iframePlayer.classList.remove('hidden');
+                    iframePlayer.src = resolvedUrl;
                 }
-                iframePlayer.src = resolvedUrl;
                 return; 
             }
 
@@ -1493,13 +1551,12 @@
             }
 
             // ==============================================
-            // 4. KIỂM TRA PROXY & RESOLVER CHO HLS/DASH/MP4
+            // 4. KIỂM TRA PROXY & CHỌN TRÌNH PHÁT BẰNG REGEX
             // ==============================================
             const needsResolve = url.includes('.php') || url.includes('vietanhtv') || url.includes('tv360') || url.includes('vieon') || url.includes('hoiquan') || url.includes('/play/') || url.includes('dpdns.org');
             if (needsResolve && resolveEnabled) {
                 loadingOverlay.classList.remove('hidden');
                 document.getElementById('resolve-status')?.classList.remove('hidden');
-                // Gọi API Resolver (Rút gọn cho demo, lấy kết quả nhanh)
                 try {
                     const res = await fetch(PROXY_BASE_URL ? `${proxyQueryPrefix()}${encodeURIComponent(url)}` : url);
                     if(res.ok) {
@@ -1511,10 +1568,11 @@
             }
 
             const isMPD = resolvedUrl.includes('.mpd') || (channel.props && channel.props['inputstream.adaptive.manifest_type'] === 'mpd');
-            const isRawTS = /\.ts(\?|$)/i.test(resolvedUrl) || /extension=ts/i.test(resolvedUrl) || resolvedUrl.includes(':2086/') || resolvedUrl.includes(':2087/');
+            const isRawTS = /\.ts(\?|#|$)/i.test(resolvedUrl) || /extension=ts/i.test(resolvedUrl) || resolvedUrl.includes(':2086/') || resolvedUrl.includes(':2087/');
             const isFLV = /\.flv(\?|#|$)/i.test(resolvedUrl) || /extension=flv/i.test(resolvedUrl);
+            const isNativeMedia = /\.(mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus)(\?|#|$)/i.test(resolvedUrl);
 
-            // Play DASH via Shaka
+            // PLAY DASH (Shaka)
             if (typeof shaka !== 'undefined' && isMPD && shaka.Player.isBrowserSupported()) {
                 shakaInstance = new shaka.Player(videoPlayer);
                 try {
@@ -1522,27 +1580,32 @@
                     videoPlayer.play();
                 } catch (e) { showToast('Lỗi phát DASH: ' + e.message, 'error'); }
             }
-            // Play HLS via hls.js
-            else if (typeof Hls !== 'undefined' && Hls.isSupported() && !isMPD && !isRawTS && !isFLV && !resolvedUrl.endsWith('.mp4')) {
-                hlsInstance = new Hls({ enableWorker: false });
-                hlsInstance.loadSource(resolvedUrl);
-                hlsInstance.attachMedia(videoPlayer);
-                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play());
+            // PLAY MP4, MP3 GỐC (Tránh Hls.js cướp nhầm)
+            else if (isNativeMedia) {
+                videoPlayer.src = resolvedUrl;
+                videoPlayer.play().catch(e => {
+                    loadingOverlay.classList.add('hidden');
+                    showToast('Đang chờ trình duyệt tải video MP4...', 'info');
+                });
             }
-            // Play TS/FLV via mpegts.js
+            // PLAY TS/FLV (mpegts.js)
             else if (typeof mpegts !== 'undefined' && mpegts.isSupported() && (isRawTS || isFLV)) {
                 mpegtsInstance = mpegts.createPlayer({ type: isFLV ? 'flv' : 'mpegts', isLive: true, url: resolvedUrl });
                 mpegtsInstance.attachMediaElement(videoPlayer);
                 mpegtsInstance.load();
                 mpegtsInstance.play();
             }
-            // Native Fallback (MP4, MP3, WebM, etc)
+            // PLAY HLS (Mặc định cho các link stream m3u8 và link proxy ẩn danh)
+            else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+                hlsInstance = new Hls({ enableWorker: false });
+                hlsInstance.loadSource(resolvedUrl);
+                hlsInstance.attachMedia(videoPlayer);
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play());
+            } 
+            // FALLBACK TRÌNH DUYỆT TỰ XỬ LÝ
             else {
                 videoPlayer.src = resolvedUrl;
-                videoPlayer.play().catch(e => {
-                    loadingOverlay.classList.add('hidden');
-                    showToast('Đang chờ trình duyệt tải video...', 'info');
-                });
+                videoPlayer.play();
             }
 
             videoPlayer.onplaying = () => {
