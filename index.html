@@ -517,6 +517,8 @@
                 class="w-full aspect-video landscape:aspect-auto landscape:flex-1 glass-panel rounded-xl landscape:rounded-none overflow-hidden relative shadow-2xl shrink-0">
                 <div class="w-full h-full bg-black relative video-container overflow-hidden">
                     <video id="video-player" class="w-full h-full object-contain" playsinline controls></video>
+                    <iframe id="youtube-player" class="w-full h-full hidden" frameborder="0"
+                        allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
 
                     <!-- Player Overlay (Intro) -->
                     <div id="player-overlay"
@@ -1002,6 +1004,26 @@
             return proxied;
         }
 
+        /**
+         * Nhận diện link YouTube (mọi dạng phổ biến) và trích xuất video ID.
+         * Trả về null nếu không phải link YouTube.
+         */
+        function extractYoutubeId(url) {
+            if (!url) return null;
+            const patterns = [
+                /youtube\.com\/watch\?(?:.*&)?v=([\w-]{11})/i,   // youtube.com/watch?v=ID
+                /youtube\.com\/live\/([\w-]{11})/i,               // youtube.com/live/ID
+                /youtube\.com\/shorts\/([\w-]{11})/i,             // youtube.com/shorts/ID
+                /youtube\.com\/embed\/([\w-]{11})/i,              // youtube.com/embed/ID
+                /youtu\.be\/([\w-]{11})/i,                        // youtu.be/ID
+            ];
+            for (const re of patterns) {
+                const m = url.match(re);
+                if (m) return m[1];
+            }
+            return null;
+        }
+
         function isDirectStreamUrl(url) {
             if (!url) return false;
             return /\.(m3u8|mpd|ts|mp4|flv|aac|mp3|m4a|ogg|webm|mov|mkv|flac|opus)(\?|#|$)/i.test(url) ||
@@ -1058,6 +1080,7 @@
 
         // DOM Elements
         const videoPlayer = document.getElementById('video-player');
+        const youtubePlayer = document.getElementById('youtube-player');
         const channelListEl = document.getElementById('channel-list');
         const emptyStateEl = document.getElementById('empty-state');
         const channelCountEl = document.getElementById('channel-count');
@@ -2239,6 +2262,22 @@
             videoPlayer.pause();
             videoPlayer.removeAttribute('src');
             videoPlayer.load();
+
+            // --- Link YouTube: nhúng qua iframe (YouTube không phát được qua thẻ <video> thường) ---
+            const youtubeId = extractYoutubeId(url);
+            if (youtubeId) {
+                videoPlayer.classList.add('hidden');
+                youtubePlayer.classList.remove('hidden');
+                youtubePlayer.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
+                loadingOverlay.classList.add('hidden');
+                playerOverlay.style.opacity = '0';
+                document.getElementById('quality-selector').classList.add('hidden');
+                return;
+            } else {
+                youtubePlayer.classList.add('hidden');
+                youtubePlayer.removeAttribute('src'); // Dừng phát YouTube (nếu kênh trước đó là YouTube)
+                videoPlayer.classList.remove('hidden');
+            }
 
             // --- Resolve proxy URL (dùng XHR + Blob URL) ---
             let resolvedUrl = url;
