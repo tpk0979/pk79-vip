@@ -424,8 +424,6 @@
         // ============================================================
         // CẤU HÌNH HỆ THỐNG
         // ============================================================
-        const PROXY_BASE_URL = "https://pk79-proxy.tongphuockhai9.workers.dev";
-        
         // IP Udpxy nội bộ (Ví dụ: http://192.168.1.1:4022). Để trống nếu không dùng UDP/Mạng FPT
         const UDPXY_SERVER = ""; 
 
@@ -442,8 +440,6 @@
         // Anti audio-distortion intervals
         let liveEdgeCheckInterval = null;
         let bufferCleanupInterval = null;
-        let currentBlobUrl = null;
-        let resolveEnabled = localStorage.getItem('resolveEnabled') === 'true';
 
         // EPG State
         const DEFAULT_EPG_URL = 'https://vnepg.site/epg.xml';
@@ -599,197 +595,6 @@
             setTimeout(() => {
                 if (container.contains(toast)) container.removeChild(toast);
             }, 3300);
-        }
-
-        // ============================================================
-        // CORE RESOLVER ENGINE
-        // ============================================================
-        async function resolveStreamUrl(url, channelProps = {}) {
-            if (isDirectStreamUrl(url)) return url;
-            const startTime = Date.now();
-
-            try {
-                const result = await xhrFetchText(url);
-                if (result.text && result.text.length > 5) {
-                    const parsed = parseResponseForStream(result.text, result.finalUrl || url, url);
-                    if (parsed) return parsed;
-                    if (result.finalUrl && result.finalUrl !== url && /\.(m3u8|mpd|ts)(\?|#|$)/i.test(result.finalUrl)) return result.finalUrl;
-                }
-            } catch (e) { }
-
-            try {
-                const response = await fetch(url, { redirect: 'follow' });
-                if (response.ok) {
-                    const finalUrl = response.url;
-                    const text = await response.text();
-                    const parsed = parseResponseForStream(text, finalUrl, url);
-                    if (parsed) return parsed;
-                    if (finalUrl !== url && !finalUrl.includes('.php')) return finalUrl;
-                }
-            } catch (e) { }
-
-            const CORS_PROXIES = [
-                ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []),
-                'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?url='
-            ];
-            for (const proxy of CORS_PROXIES) {
-                try {
-                    const proxyUrl = proxy + encodeURIComponent(url);
-                    const resp = await fetch(proxyUrl, { redirect: 'follow' });
-                    if (resp.ok) {
-                        const text = await resp.text();
-                        if (text && text.length > 5) {
-                            const parsed = parseResponseForStream(text, url, url);
-                            if (parsed) return parsed;
-                            if (text.includes('#EXTM3U') || text.includes('#EXTINF')) {
-                                const blob = new Blob([text], { type: 'application/vnd.apple.mpegurl' });
-                                if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-                                currentBlobUrl = URL.createObjectURL(blob);
-                                return currentBlobUrl;
-                            }
-                        }
-                    }
-                } catch (e) { }
-            }
-            return url;
-        }
-
-        function xhrFetchText(url) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, true);
-                    xhr.timeout = 20000;
-                    xhr.responseType = 'text';
-                    xhr.onload = function() {
-                        if (xhr.status === 200 || xhr.status === 302 || xhr.status === 301 || xhr.status === 0) {
-                            resolve({ text: xhr.responseText, finalUrl: xhr.responseURL || url });
-                        } else {
-                            reject(new Error(`HTTP ${xhr.status}`));
-                        }
-                    };
-                    xhr.onerror = () => reject(new Error('XHR error'));
-                    xhr.ontimeout = () => reject(new Error('XHR timeout'));
-                    xhr.send();
-                } catch (e) { reject(e); }
-            });
-        }
-
-        function parseResponseForStream(text, finalUrl, originalUrl) {
-            if (!text || text.length < 5) return null;
-            const trimmed = text.trim();
-
-            if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-                try {
-                    const json = JSON.parse(trimmed);
-                    const url = findUrlInJson(json);
-                    if (url) return url;
-                    if (json.keys || json.kid) return trimmed;
-                } catch { }
-            }
-
-            if (text.includes('#EXTM3U') || text.includes('#EXTINF')) {
-                const lines = text.split('\n');
-                for (const line of lines) {
-                    const l = line.trim();
-                    if (l.startsWith('http') && (l.includes('.m3u8') || l.includes('.ts') || l.includes('.mp4'))) return l;
-                    if (l.endsWith('.m3u8') || l.endsWith('.ts')) {
-                        try { return new URL(l, finalUrl || originalUrl).href; } catch { return l; }
-                    }
-                }
-                if (finalUrl && finalUrl !== originalUrl && !finalUrl.includes('.php')) return finalUrl;
-                return text;
-            }
-
-            if (text.includes('<MPD') || (text.includes('<?xml') && text.includes('mpd:'))) {
-                if (finalUrl && finalUrl !== originalUrl) return finalUrl;
-                return text;
-            }
-
-            const urls = [...trimmed.matchAll(/https?:\/\/[^\s<>"']+/g)].map(m => m[0]);
-            const streamUrls = urls.filter(u => /\.(m3u8|mpd|ts|mp4|flv|aac|mp3|m4a)(\?|#|$)/i.test(u));
-            if (streamUrls.length > 0) return streamUrls[0];
-            if (urls.length === 1) return urls[0];
-
-            if (text.includes('<html') || text.includes('<!DOCTYPE')) {
-                const patterns = [
-                    /<iframe[^>]+src=["'](https?:\/\/[^"']+)["']/i,
-                    /<video[^>]+src=["'](https?:\/\/[^"']+)["']/i,
-                    /<source[^>]+src=["'](https?:\/\/[^"']+)["']/i,
-                    /<a[^>]+href=["'](https?:\/\/[^"']+\.(?:m3u8|mpd|ts)[^"']*)["']/i,
-                ];
-                for (const pattern of patterns) {
-                    const match = text.match(pattern);
-                    if (match) return match[1];
-                }
-                for (const u of urls) {
-                    if (/\.(m3u8|mpd|ts)(\?|#|$)/i.test(u)) return u;
-                }
-            }
-
-            const deepMatch = text.match(/https?:\/\/[^'"\s<>)]+\.(?:m3u8|mpd|ts)[^'"\s<>)]*/i);
-            if (deepMatch) return deepMatch[0];
-            return null;
-        }
-
-        function findUrlInJson(json) {
-            if (!json || typeof json !== 'object') return null;
-            const keys = ['url', 'link', 'src', 'source', 'file', 'location', 'redirect', 'stream', 'stream_url', 'streamUrl', 'hls', 'dash', 'm3u8', 'mpd'];
-            for (const key of keys) {
-                if (typeof json[key] === 'string' && json[key].startsWith('http')) return json[key];
-            }
-            for (const key of Object.keys(json)) {
-                if (typeof json[key] === 'object') {
-                    const result = findUrlInJson(json[key]);
-                    if (result) return result;
-                }
-            }
-            if (Array.isArray(json)) {
-                for (const item of json) {
-                    const result = findUrlInJson(item);
-                    if (result) return result;
-                }
-            }
-            return null;
-        }
-
-        function getChannelHeaders(channel) {
-            const props = (channel && channel.props) || {};
-            const findProp = (...keys) => {
-                for (const k of keys) {
-                    if (props[k]) return props[k];
-                    const found = Object.keys(props).find(pk => pk.toLowerCase() === k.toLowerCase());
-                    if (found && props[found]) return props[found];
-                }
-                return '';
-            };
-            return {
-                userAgent: findProp('http-user-agent', 'user-agent', 'useragent'),
-                referer: findProp('http-referrer', 'http-referer', 'referrer', 'referer')
-            };
-        }
-
-        function proxyQueryPrefix() {
-            if (!PROXY_BASE_URL) return '';
-            return /\.php(\?.*)?$/i.test(PROXY_BASE_URL) ? PROXY_BASE_URL + '?url=' : PROXY_BASE_URL.replace(/\/$/, '') + '/?url=';
-        }
-
-        function buildProxyUrl(targetUrl, userAgent, referer) {
-            if (!PROXY_BASE_URL) return targetUrl;
-            let proxied = proxyQueryPrefix() + encodeURIComponent(targetUrl);
-            if (userAgent) proxied += '&ua=' + encodeURIComponent(userAgent);
-            if (referer) proxied += '&ref=' + encodeURIComponent(referer);
-            return proxied;
-        }
-
-        function isDirectStreamUrl(url) {
-            if (!url) return false;
-            return /\.(m3u8|mpd|ts|mp4|flv|aac|mp3|m4a|ogg|webm|mov|mkv|flac|opus)(\?|#|$)/i.test(url) ||
-                   url.includes('Manifest') || url.includes('playlist.m3u') ||
-                   url.includes('/play/') || url.includes(':2086/') || url.includes(':2087/') ||
-                   url.startsWith('udp://') || url.startsWith('magnet:') || url.endsWith('.torrent') ||
-                   getYoutubeId(url) !== null || url.includes('twitch.tv/') || url.includes('iframe=true');
         }
 
         // ============================================================
@@ -1079,33 +884,22 @@
                 return;
             }
 
-            // Tải playlist qua API/Proxy
+            // Tải playlist từ URL (Xóa bỏ cơ chế Proxy phức tạp gây lỗi)
             closeAddDialog();
             showToast('Đang kết nối URL...', 'success');
             let text = '';
-            const isLocal = !urlInput.startsWith('http');
-            const proxies = isLocal ? [''] : [
-                ...(PROXY_BASE_URL ? [proxyQueryPrefix()] : []), '',
-                'https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?url='
-            ];
-
-            let success = false;
-            for (const proxy of proxies) {
-                try {
-                    const fetchUrl = proxy ? proxy + encodeURIComponent(urlInput) : urlInput;
-                    const response = await fetch(fetchUrl, { headers: { 'Accept': 'text/plain, */*' } });
-                    if (response.ok) {
-                        text = await response.text();
-                        const trimmedText = text.trim();
-                        if (trimmedText.startsWith('{') || trimmedText.startsWith('[') || trimmedText.startsWith('<?xml') || text.includes('#EXTM3U') || /^https?:\/\//im.test(trimmedText)) {
-                            success = true;
-                            break;
-                        }
-                    }
-                } catch (e) { }
+            
+            try {
+                const response = await fetch(urlInput, { headers: { 'Accept': 'text/plain, */*' } });
+                if (response.ok) {
+                    text = await response.text();
+                } else {
+                    return showToast('Lỗi lấy dữ liệu từ URL. Hãy tải file m3u về máy rồi mở!', 'error');
+                }
+            } catch (e) { 
+                return showToast('Website gốc đang chặn quyền truy cập (CORS). Hãy tải file m3u về máy rồi mở!', 'error');
             }
 
-            if (!success) return showToast('Lỗi lấy dữ liệu từ URL, website có thể chặn CORS.', 'error');
             const parsedChannels = autoParsePlaylist(text);
             if (!parsedChannels.length) return showToast('Không tìm thấy kênh nào trong nguồn phát này.', 'error');
             processData(parsedChannels);
@@ -1187,24 +981,8 @@
             const ytPlayerEl = document.getElementById('yt-player');
             if (ytPlayerEl) ytPlayerEl.classList.add('hidden');
 
-            if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
             playerOverlay.style.opacity = '1';
             currentPlayingUrl = null;
-        }
-
-        function base64ToHex(base64) {
-            if (!base64) return '';
-            let b64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-            while (b64.length % 4 !== 0) b64 += '=';
-            try {
-                const raw = atob(b64);
-                let result = '';
-                for (let i = 0; i < raw.length; i++) {
-                    const hex = raw.charCodeAt(i).toString(16);
-                    result += (hex.length === 2 ? hex : '0' + hex);
-                }
-                return result.toLowerCase();
-            } catch (e) { return ''; }
         }
 
         async function stopChannel() {
@@ -1225,7 +1003,6 @@
             
             videoPlayer.classList.remove('hidden');
 
-            if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
             currentPlayingUrl = null;
             playerOverlay.style.opacity = '1';
             loadingOverlay.classList.add('hidden');
@@ -1551,22 +1328,10 @@
             }
 
             // ==============================================
-            // 4. KIỂM TRA PROXY & CHỌN TRÌNH PHÁT BẰNG REGEX
+            // 4. KIỂM TRA ĐỊNH DẠNG & CHỌN TRÌNH PHÁT
+            // (Đã loại bỏ Fetch/Proxy ẩn danh để giữ luồng gốc mượt mà)
             // ==============================================
-            const needsResolve = url.includes('.php') || url.includes('vietanhtv') || url.includes('tv360') || url.includes('vieon') || url.includes('hoiquan') || url.includes('/play/') || url.includes('dpdns.org');
-            if (needsResolve && resolveEnabled) {
-                loadingOverlay.classList.remove('hidden');
-                document.getElementById('resolve-status')?.classList.remove('hidden');
-                try {
-                    const res = await fetch(PROXY_BASE_URL ? `${proxyQueryPrefix()}${encodeURIComponent(url)}` : url);
-                    if(res.ok) {
-                        const text = await res.text();
-                        if(text.includes('m3u8') && text.startsWith('http')) resolvedUrl = text;
-                    }
-                } catch(e) {}
-                document.getElementById('resolve-status')?.classList.add('hidden');
-            }
-
+            
             const isMPD = resolvedUrl.includes('.mpd') || (channel.props && channel.props['inputstream.adaptive.manifest_type'] === 'mpd');
             const isRawTS = /\.ts(\?|#|$)/i.test(resolvedUrl) || /extension=ts/i.test(resolvedUrl) || resolvedUrl.includes(':2086/') || resolvedUrl.includes(':2087/');
             const isFLV = /\.flv(\?|#|$)/i.test(resolvedUrl) || /extension=flv/i.test(resolvedUrl);
@@ -1580,7 +1345,7 @@
                     videoPlayer.play();
                 } catch (e) { showToast('Lỗi phát DASH: ' + e.message, 'error'); }
             }
-            // PLAY MP4, MP3 GỐC (Tránh Hls.js cướp nhầm)
+            // PLAY MP4, MP3 GỐC (Native Video Player)
             else if (isNativeMedia) {
                 videoPlayer.src = resolvedUrl;
                 videoPlayer.play().catch(e => {
@@ -1595,7 +1360,7 @@
                 mpegtsInstance.load();
                 mpegtsInstance.play();
             }
-            // PLAY HLS (Mặc định cho các link stream m3u8 và link proxy ẩn danh)
+            // PLAY HLS (Mặc định cho các link stream m3u8)
             else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                 hlsInstance = new Hls({ enableWorker: false });
                 hlsInstance.loadSource(resolvedUrl);
