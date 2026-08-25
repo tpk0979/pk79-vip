@@ -2310,7 +2310,8 @@
 
             // --- Resolve proxy URL (dùng XHR + Blob URL) ---
             let resolvedUrl = url;
-            const needsResolve = url.includes('.php') || url.includes('vietanhtv') || url.includes('tv360') || url.includes('vieon') || url.includes('hoiquan') || url.includes('/play/') || url.includes('dpdns.org');
+            const needsResolve = (url.includes('.php') || url.includes('vietanhtv') || url.includes('tv360') || url.includes('vieon') || url.includes('hoiquan') || url.includes('/play/') || url.includes('dpdns.org'))
+                && !url.includes('googledrive') && !url.includes('download.php'); // Link tải file trực tiếp -> bỏ qua resolver (cần CORS mà link này không có), phát thẳng bằng native player
             if (needsResolve) {
                 if (resolveEnabled) {
                     // === CHẾ ĐỘ BẬT: Fetch + parse response để tìm stream URL ===
@@ -2486,6 +2487,12 @@
                             resolvedUrl.includes('/play/');
             const isFLV = /\.flv(\?|#|$)/i.test(resolvedUrl) || /extension=flv/i.test(resolvedUrl);
             const isRtmpOrRtsp = /^rtmps?:\/\//i.test(resolvedUrl) || /^rtsp:\/\//i.test(resolvedUrl);
+            // Link media trực tiếp (mp4/webm/mov/mkv/audio...) -> phải phát bằng native <video>,
+            // KHÔNG được đưa vào Hls.js (Hls.js chỉ hiểu manifest .m3u8, không hiểu file video thường).
+            // Google Drive downloader (không có đuôi file rõ ràng trong URL) cũng xếp vào nhóm này,
+            // vì bản chất nó luôn trả về 1 file video/audio cụ thể, không phải playlist.
+            const isDirectMedia = /\.(mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus|avi|3gp)(\?|#|$)/i.test(resolvedUrl)
+                || resolvedUrl.includes('googledrive') || resolvedUrl.includes('download.php');
 
             // Trình duyệt không thể phát RTMP/RTSP trực tiếp (cần plugin/native app) — báo lỗi rõ ràng thay vì treo màn hình
             if (isRtmpOrRtsp) {
@@ -2527,7 +2534,7 @@
             }
 
             // --- Case 1: DASH / MPD (Using Shaka Player) ---
-            if (typeof shaka !== 'undefined' && isMPD && shaka.Player.isBrowserSupported()) {
+            if (typeof shaka !== 'undefined' && isMPD && !isDirectMedia && shaka.Player.isBrowserSupported()) {
                 shakaInstance = new shaka.Player(videoPlayer);
 
                 // Handle DRM
@@ -2764,7 +2771,7 @@
 
             }
             // --- Case 2: HLS / M3U8 (Using Hls.js) ---
-            else if (typeof Hls !== 'undefined' && Hls.isSupported() && !isMPD) {
+            else if (typeof Hls !== 'undefined' && Hls.isSupported() && !isMPD && !isDirectMedia && !isRawTS && !isFLV) {
                 hlsInstance = new Hls({
                     enableWorker: false,             // Tắt worker trên Windows để tránh lệch clock âm thanh
                     lowLatencyMode: false,
