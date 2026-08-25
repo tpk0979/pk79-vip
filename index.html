@@ -2494,6 +2494,25 @@
             const isDirectMedia = /\.(mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus|avi|3gp)(\?|#|$)/i.test(resolvedUrl)
                 || resolvedUrl.includes('googledrive') || resolvedUrl.includes('download.php');
 
+            console.log(`[Player] Chuẩn bị phát: ${channel.name}\n  URL cuối: ${resolvedUrl}\n  isMPD=${isMPD} isRawTS=${isRawTS} isFLV=${isFLV} isDirectMedia=${isDirectMedia} isRtmpOrRtsp=${isRtmpOrRtsp}`);
+
+            // Watchdog: nếu sau 15s vẫn còn loading, in ra trạng thái để chẩn đoán
+            const watchdogUrl = resolvedUrl;
+            setTimeout(() => {
+                if (currentPlayingUrl === url && !loadingOverlay.classList.contains('hidden')) {
+                    console.warn(`[Watchdog] Vẫn đang loading sau 15s cho: ${channel.name}`, {
+                        readyState: videoPlayer.readyState,
+                        networkState: videoPlayer.networkState,
+                        error: videoPlayer.error,
+                        currentSrc: videoPlayer.currentSrc,
+                        hlsInstance: !!hlsInstance,
+                        shakaInstance: !!shakaInstance,
+                        mpegtsInstance: !!mpegtsInstance,
+                        url: watchdogUrl
+                    });
+                }
+            }, 15000);
+
             // Trình duyệt không thể phát RTMP/RTSP trực tiếp (cần plugin/native app) — báo lỗi rõ ràng thay vì treo màn hình
             if (isRtmpOrRtsp) {
                 loadingOverlay.classList.add('hidden');
@@ -2535,6 +2554,7 @@
 
             // --- Case 1: DASH / MPD (Using Shaka Player) ---
             if (typeof shaka !== 'undefined' && isMPD && !isDirectMedia && shaka.Player.isBrowserSupported()) {
+                console.log('[Player] → Dùng Shaka Player (DASH/MPD)');
                 shakaInstance = new shaka.Player(videoPlayer);
 
                 // Handle DRM
@@ -2772,6 +2792,7 @@
             }
             // --- Case 2: HLS / M3U8 (Using Hls.js) ---
             else if (typeof Hls !== 'undefined' && Hls.isSupported() && !isMPD && !isDirectMedia && !isRawTS && !isFLV) {
+                console.log('[Player] → Dùng Hls.js (HLS/M3U8)');
                 hlsInstance = new Hls({
                     enableWorker: false,             // Tắt worker trên Windows để tránh lệch clock âm thanh
                     lowLatencyMode: false,
@@ -2947,6 +2968,7 @@
             }
             // --- Case 3: Raw MPEG-TS / FLV stream (Using mpegts.js) ---
             else if (typeof mpegts !== 'undefined' && mpegts.isSupported() && (isRawTS || isFLV)) {
+                console.log('[Player] → Dùng mpegts.js (TS/FLV)');
                 mpegtsInstance = mpegts.createPlayer({
                     type: isFLV ? 'flv' : 'mpegts',
                     isLive: true,
@@ -2991,10 +3013,12 @@
             }
             // --- Case 4: Fallback (Native browser playback) ---
             else {
+                console.log('[Player] → Dùng Native <video> (fallback trực tiếp)');
                 videoPlayer.src = resolvedUrl;
                 videoPlayer.play().catch(e => {
                     loadingOverlay.classList.add('hidden');
                     showToast('Đang chờ trình duyệt tải video...', 'info');
+                    console.log('[Player] Native play() bị từ chối:', e.message);
                 });
             }
 
@@ -3018,6 +3042,8 @@
 
             videoPlayer.onerror = () => {
                 const nativeError = videoPlayer.error;
+                const errorNames = { 1: 'MEDIA_ERR_ABORTED', 2: 'MEDIA_ERR_NETWORK', 3: 'MEDIA_ERR_DECODE', 4: 'MEDIA_ERR_SRC_NOT_SUPPORTED' };
+                console.error('[Player] Native <video> error:', nativeError ? `${errorNames[nativeError.code] || nativeError.code} - ${nativeError.message}` : nativeError);
                 // Chỉ tự động reload nếu không dùng Hls.js/Shaka/Mpegts (hoặc khi fallback lỗi native thực sự)
                 // Hạn chế reload liên tục nếu lỗi MEDIA_ERR_SRC_NOT_SUPPORTED
                 if (!hlsInstance && !shakaInstance && !mpegtsInstance) {
