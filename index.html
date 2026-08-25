@@ -1005,22 +1005,33 @@
         }
 
         /**
-         * Nhận diện link YouTube (mọi dạng phổ biến) và trích xuất video ID.
-         * Trả về null nếu không phải link YouTube.
+         * Nhận diện link YouTube (mọi dạng phổ biến, kể cả có thêm tham số như ?si=...)
+         * và trích xuất video ID. Trả về null nếu không phải link YouTube.
          */
         function extractYoutubeId(url) {
             if (!url) return null;
-            const patterns = [
-                /youtube\.com\/watch\?(?:.*&)?v=([\w-]{11})/i,   // youtube.com/watch?v=ID
-                /youtube\.com\/live\/([\w-]{11})/i,               // youtube.com/live/ID
-                /youtube\.com\/shorts\/([\w-]{11})/i,             // youtube.com/shorts/ID
-                /youtube\.com\/embed\/([\w-]{11})/i,              // youtube.com/embed/ID
-                /youtu\.be\/([\w-]{11})/i,                        // youtu.be/ID
-            ];
-            for (const re of patterns) {
-                const m = url.match(re);
-                if (m) return m[1];
+            let u;
+            try { u = new URL(url); } catch (e) { return null; }
+
+            const host = u.hostname.replace(/^www\./i, '').replace(/^m\./i, '').toLowerCase();
+            const ID_RE = /^[\w-]{10,12}$/; // ID YouTube chuẩn dài 11 ký tự, nới lỏng biên 10-12 cho an toàn
+
+            if (host === 'youtu.be') {
+                const id = u.pathname.split('/').filter(Boolean)[0];
+                return id && ID_RE.test(id) ? id : null;
             }
+
+            if (host === 'youtube.com' || host === 'music.youtube.com') {
+                // youtube.com/watch?v=ID
+                const vParam = u.searchParams.get('v');
+                if (vParam && ID_RE.test(vParam)) return vParam;
+
+                // youtube.com/live/ID, /shorts/ID, /embed/ID
+                const parts = u.pathname.split('/').filter(Boolean);
+                const idx = parts.findIndex(p => ['live', 'shorts', 'embed'].includes(p));
+                if (idx !== -1 && parts[idx + 1] && ID_RE.test(parts[idx + 1])) return parts[idx + 1];
+            }
+
             return null;
         }
 
@@ -1565,18 +1576,12 @@
             const urlInput = document.getElementById('url-input').value.trim();
             if (!urlInput) return showToast('Vui lòng dán đường dẫn URL!', 'error');
 
-            // === Phát hiện link luồng trực tiếp (video/audio) ===
-            // Các link này là stream cần phát, KHÔNG phải playlist IPTV cần parse
-            const isDirectM3U8 = /\.m3u8(\?|#|$)/i.test(urlInput);
-            const isDirectMPD = /\.mpd(\?|#|$)/i.test(urlInput);
-            const isDirectTS = /\.ts(\?|#|$)/i.test(urlInput) || /extension=ts/i.test(urlInput);
-            const isDirectMedia = /\.(flv|mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus)(\?|#|$)/i.test(urlInput);
-            const isRtmpRtsp = /^rtmps?:\/\//i.test(urlInput) || /^rtsp:\/\//i.test(urlInput);
-            const youtubeId = extractYoutubeId(urlInput);
-
             // Link YouTube -> phát thẳng qua iframe nhúng, KHÔNG thử fetch/parse như playlist
-            // (fetch trực tiếp trang YouTube luôn bị chặn CORS, không phải lỗi cần dò proxy)
+            // (fetch trực tiếp trang YouTube luôn bị chặn CORS, không phải lỗi cần dò proxy).
+            // Kiểm tra NGAY ĐẦU TIÊN, trước mọi logic khác, để chắc chắn không lọt qua bước fetch nào.
+            const youtubeId = extractYoutubeId(urlInput);
             if (youtubeId) {
+                console.log('[YouTube] Nhận diện video ID:', youtubeId);
                 closeAddDialog();
                 showToast('Đang phát video YouTube...', 'success');
                 playChannel({
@@ -1588,6 +1593,14 @@
                 });
                 return;
             }
+
+            // === Phát hiện link luồng trực tiếp (video/audio) ===
+            // Các link này là stream cần phát, KHÔNG phải playlist IPTV cần parse
+            const isDirectM3U8 = /\.m3u8(\?|#|$)/i.test(urlInput);
+            const isDirectMPD = /\.mpd(\?|#|$)/i.test(urlInput);
+            const isDirectTS = /\.ts(\?|#|$)/i.test(urlInput) || /extension=ts/i.test(urlInput);
+            const isDirectMedia = /\.(flv|mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus)(\?|#|$)/i.test(urlInput);
+            const isRtmpRtsp = /^rtmps?:\/\//i.test(urlInput) || /^rtsp:\/\//i.test(urlInput);
 
             if (isRtmpRtsp) {
                 closeAddDialog();
