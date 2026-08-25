@@ -1572,6 +1572,22 @@
             const isDirectTS = /\.ts(\?|#|$)/i.test(urlInput) || /extension=ts/i.test(urlInput);
             const isDirectMedia = /\.(flv|mp4|webm|mov|mkv|mp3|aac|m4a|ogg|flac|opus)(\?|#|$)/i.test(urlInput);
             const isRtmpRtsp = /^rtmps?:\/\//i.test(urlInput) || /^rtsp:\/\//i.test(urlInput);
+            const youtubeId = extractYoutubeId(urlInput);
+
+            // Link YouTube -> phát thẳng qua iframe nhúng, KHÔNG thử fetch/parse như playlist
+            // (fetch trực tiếp trang YouTube luôn bị chặn CORS, không phải lỗi cần dò proxy)
+            if (youtubeId) {
+                closeAddDialog();
+                showToast('Đang phát video YouTube...', 'success');
+                playChannel({
+                    name: 'YouTube: ' + youtubeId,
+                    url: urlInput,
+                    logo: '',
+                    group: 'Phát trực tiếp',
+                    props: {}
+                });
+                return;
+            }
 
             if (isRtmpRtsp) {
                 closeAddDialog();
